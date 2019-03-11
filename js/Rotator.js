@@ -1,8 +1,6 @@
 class Rotator {
     constructor(svgControllerInstance) {
         this.svgC = svgControllerInstance;
-        this.x = '0';
-        this.y = '0';
         this.right = false;
     }
 
@@ -24,16 +22,13 @@ class Rotator {
         var width = this.svgC.svg.style.width.replace('px', '');
         var oldH = this.svgC.svg.style.height.replace('px', '');
         var newH = width / oldH * width;
-        this.refreshXY(rotation, width, newH);
-
-        this.svgC.svgImg.setAttributeNS(null, 'x', this.x);
-        this.svgC.svgImg.setAttributeNS(null, 'y', this.y);
+        this.svgC.refreshXY(rotation, width, newH);
 
         if (rotation === 90 || rotation === 270) {
             // noinspection JSSuspiciousNameCombination
-            this.setWidthAndHeight(newH, width);
+            this.svgC.setWidthAndHeight(newH, width);
         } else {
-            this.setWidthAndHeight(width, newH);
+            this.svgC.setWidthAndHeight(width, newH);
         }
 
         this.rotateEllipses(width, oldH, width, newH);
@@ -41,31 +36,6 @@ class Rotator {
         this.svgC.svg.style.height = newH + 'px';
         this.svgC.svgImg.setAttribute('transform', 'rotate(' + rotation + ')');
 
-    }
-
-    setWidthAndHeight(width, height) {
-        this.svgC.svgImg.style.width = width;
-        this.svgC.svgImg.style.height = height;
-
-        this.svgC.svgImg.setAttributeNS(null, 'width', width); //firefox
-        this.svgC.svgImg.setAttributeNS(null, 'height', height); //firefox
-    }
-
-    refreshXY(rotation, width, height) {
-        if (rotation === 0) {
-            this.x = '0';
-            this.y = '0';
-        } else if (rotation === 90) {
-            this.x = '0';
-            this.y = '-' + width;
-        } else if (rotation === 180) {
-            this.x = '-' + width;
-            this.y = '-' + height;
-
-        } else if (rotation === 270) {
-            this.x = '-' + height;
-            this.y = '0';
-        }
     }
 
     rotateEllipses(oldW, oldH, newW, newH) {

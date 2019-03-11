@@ -2,10 +2,18 @@ class SVGController {
     constructor(svgId) {
         this.svg = document.getElementById(svgId);
         this.svgNS = "http://www.w3.org/2000/svg";
+
+        //init img
         this.svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.svgImg.setAttributeNS(null, 'x', '0');
+        this.svgImg.setAttributeNS(null, 'y', '0');
+        this.svgImg.setAttributeNS(null, 'visibility', 'visible');
         this.svg.appendChild(this.svgImg); //add image to svg
+
         this.svgEllipses = [];
         this.rotation = 0;
+        this.x = '0';
+        this.y = '0';
     }
 
     clear() {
@@ -20,25 +28,30 @@ class SVGController {
 
     drawImg(image) {
         this.svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image.src);
-        this.svgImg.setAttributeNS(null, 'x', '0');
-        this.svgImg.setAttributeNS(null, 'y', '0');
-        this.svgImg.setAttributeNS(null, 'visibility', 'visible');
 
         //small screens
         this.screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-        var calcWidth = 0.9 * this.screenWidth;
-        var calcHeight = image.height / image.width * 0.9 * this.screenWidth;
+        var coef = this.screenWidth >= 980 ? 0.5 : 0.9;
 
-        //big screens
-        if (this.screenWidth >= 980) {
-            calcWidth = 0.5 * this.screenWidth;
-            calcHeight = image.height / image.width * 0.5 * this.screenWidth;
+        var calcWidth = coef * this.screenWidth;
+        var calcHeight;
+
+        if(this.rotation === 0 || this.rotation === 180) {
+            calcHeight = image.height / image.width * coef * this.screenWidth;
+            this.refreshXY(this.rotation, calcWidth, calcHeight);
+
+            this.svg.style.height = calcHeight + 'px';
+            this.svg.style.width = calcWidth + 'px';
+            this.setWidthAndHeight(calcWidth, calcHeight);
+        } else {
+            calcHeight = image.width / image.height * coef * this.screenWidth;
+            this.refreshXY(this.rotation, calcWidth, calcHeight);
+
+            this.svg.style.height = calcHeight + 'px';
+            this.svg.style.width = calcWidth + 'px';
+            // noinspection JSSuspiciousNameCombination
+            this.setWidthAndHeight(calcHeight, calcWidth);
         }
-
-        this.svgImg.setAttributeNS(null, 'width', calcWidth);
-        this.svgImg.setAttributeNS(null, 'height', calcHeight);
-        this.svg.style.width = calcWidth + 'px';
-        this.svg.style.height = calcHeight + 'px';
 
     }
 
@@ -65,5 +78,33 @@ class SVGController {
             ellipse.setAttributeNS(null, 'cy', newCY);
 
         }
+    }
+
+    refreshXY(rotation, width, height) {
+        if (rotation === 0) {
+            this.x = '0';
+            this.y = '0';
+        } else if (rotation === 90) {
+            this.x = '0';
+            this.y = '-' + width;
+        } else if (rotation === 180) {
+            this.x = '-' + width;
+            this.y = '-' + height;
+
+        } else if (rotation === 270) {
+            this.x = '-' + height;
+            this.y = '0';
+        }
+
+        this.svgImg.setAttributeNS(null, 'x', this.x);
+        this.svgImg.setAttributeNS(null, 'y', this.y);
+    }
+
+    setWidthAndHeight(width, height) {
+        this.svgImg.style.width = width;
+        this.svgImg.style.height = height;
+
+        this.svgImg.setAttributeNS(null, 'width', width); //firefox
+        this.svgImg.setAttributeNS(null, 'height', height); //firefox
     }
 }
