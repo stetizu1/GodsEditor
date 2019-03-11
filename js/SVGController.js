@@ -30,39 +30,41 @@ class SVGController {
         this.svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image.src);
 
         //small screens
-        this.screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-        var coef = this.screenWidth >= 980 ? 0.5 : 0.9;
+        var screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+        var coef = screenWidth >= 980 ? 0.5 : 0.9;
 
-        var calcWidth = coef * this.screenWidth;
+        this.calcWidth = coef * screenWidth;
         var calcHeight;
 
         if(this.rotation === 0 || this.rotation === 180) {
-            calcHeight = image.height / image.width * coef * this.screenWidth;
-            this.refreshXY(this.rotation, calcWidth, calcHeight);
+            calcHeight = image.height / image.width * coef * screenWidth;
+            this.refreshXY(this.rotation, this.calcWidth, calcHeight);
 
             this.svg.style.height = calcHeight + 'px';
-            this.svg.style.width = calcWidth + 'px';
-            this.setWidthAndHeight(calcWidth, calcHeight);
+            this.svg.style.width = this.calcWidth + 'px';
+            this.setWidthAndHeight(this.calcWidth, calcHeight);
         } else {
-            calcHeight = image.width / image.height * coef * this.screenWidth;
-            this.refreshXY(this.rotation, calcWidth, calcHeight);
+            calcHeight = image.width / image.height * coef * screenWidth;
+            this.refreshXY(this.rotation, this.calcWidth, calcHeight);
 
             this.svg.style.height = calcHeight + 'px';
-            this.svg.style.width = calcWidth + 'px';
+            this.svg.style.width = this.calcWidth + 'px';
             // noinspection JSSuspiciousNameCombination
-            this.setWidthAndHeight(calcHeight, calcWidth);
+            this.setWidthAndHeight(calcHeight, this.calcWidth);
         }
 
     }
 
     redrawImage(image) {
-        var oldWidth = this.screenWidth;
+        var oldWidth = this.calcWidth;
         this.drawImg(image);
         this.drawEllipses(oldWidth);
     }
 
     drawEllipses(oldWidth) {
-        var resize = this.screenWidth / oldWidth;
+        console.log('old: ' + oldWidth );
+        console.log('new: ' + oldWidth );
+        var resize = this.calcWidth / oldWidth;
         for (var i = 0; i < this.svgEllipses.length; i++) {
             var ellipse = this.svgEllipses[i];
 
