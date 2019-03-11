@@ -14,7 +14,7 @@
     <button id="turnRight" class="button">Otočit vpravo</button>
 </div>
 <div class="svgContainer">
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg">
         <defs id="defs">
             <filter id="blurFilter" y="-5" height="40">
                 <feGaussianBlur in="SourceGraphic" stdDeviation="3" y="-5"/>
@@ -23,7 +23,11 @@
     </svg>
 </div>
 <div class="canvasContainer">
-<canvas></canvas>
+<canvas id="0000full" class="full0"></canvas>
+<canvas id="0000thumb" class="thumb"></canvas>
+<canvas id="0000mediumL" class="medium landscape"></canvas>
+<canvas id="0000mediumP" class="medium portrait"></canvas>
+
 </div>
 <button id="save" class="button wide">Uložit</button>
 <a id="download" class="button wide">Stáhnout</a>
@@ -38,8 +42,8 @@
 <script src="js/BlurFace.js"></script>
 <script>
 
-var SVGInst = new SVGController();
-var CanvasInst = new CanvasController(SVGInst);
+var SVGInst = new SVGController('svg');
+var CanvasInst = new CanvasController('0000full',SVGInst);
 
 var fileManagement = new FileManager(SVGInst, CanvasInst);
 var rotator = new Rotator(SVGInst);

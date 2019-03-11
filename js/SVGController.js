@@ -1,6 +1,6 @@
 class SVGController {
-    constructor() {
-        this.svg = document.querySelector('svg');
+    constructor(svgId) {
+        this.svg = document.getElementById(svgId);
         this.svgNS = "http://www.w3.org/2000/svg";
         this.svgImg = null;
         this.svgEllipses = [];

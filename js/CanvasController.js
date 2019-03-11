@@ -1,7 +1,7 @@
 class CanvasController {
-    constructor(svgControllerInstance) {
+    constructor(canvasId, svgControllerInstance) {
         this.svgC = svgControllerInstance;
-        this.canvas = document.querySelector('canvas');
+        this.canvas = document.getElementById(canvasId);
         this.canvasCtx = this.canvas.getContext('2d');
     }
 
