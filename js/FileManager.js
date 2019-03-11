@@ -24,6 +24,9 @@ class FileManager {
                     this.svgC.rotation = 0;
                     this.svgC.clear(); //clear old image
                     this.svgC.drawImg(this.image);
+                    window.addEventListener('resize', () =>{
+                        this.svgC.redrawImage(this.image);
+                    });
                 };
                 this.image.src = fr.result;
 

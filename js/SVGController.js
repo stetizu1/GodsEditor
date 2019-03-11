@@ -2,7 +2,8 @@ class SVGController {
     constructor(svgId) {
         this.svg = document.getElementById(svgId);
         this.svgNS = "http://www.w3.org/2000/svg";
-        this.svgImg = null;
+        this.svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.svg.appendChild(this.svgImg); //add image to svg
         this.svgEllipses = [];
         this.rotation = 0;
     }
@@ -18,29 +19,51 @@ class SVGController {
     }
 
     drawImg(image) {
-        var svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image.src);
-        svgImg.setAttributeNS(null, 'x', '0');
-        svgImg.setAttributeNS(null, 'y', '0');
-        svgImg.setAttributeNS(null, 'visibility', 'visible');
+        this.svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image.src);
+        this.svgImg.setAttributeNS(null, 'x', '0');
+        this.svgImg.setAttributeNS(null, 'y', '0');
+        this.svgImg.setAttributeNS(null, 'visibility', 'visible');
 
         //small screens
-        var screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-        var calcWidth = 0.9 * screenWidth;
-        var calcHeight = image.height / image.width * 0.9 * screenWidth;
+        this.screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+        var calcWidth = 0.9 * this.screenWidth;
+        var calcHeight = image.height / image.width * 0.9 * this.screenWidth;
 
         //big screens
-        if (screenWidth >= 980) {
-            calcWidth = 0.5 * screenWidth;
-            calcHeight = image.height / image.width * 0.5 * screenWidth;
+        if (this.screenWidth >= 980) {
+            calcWidth = 0.5 * this.screenWidth;
+            calcHeight = image.height / image.width * 0.5 * this.screenWidth;
         }
 
-        svgImg.setAttributeNS(null, 'width', calcWidth);
-        svgImg.setAttributeNS(null, 'height', calcHeight);
+        this.svgImg.setAttributeNS(null, 'width', calcWidth);
+        this.svgImg.setAttributeNS(null, 'height', calcHeight);
         this.svg.style.width = calcWidth + 'px';
-        this.svg.style.height =  calcHeight + 'px';
+        this.svg.style.height = calcHeight + 'px';
 
-        this.svg.appendChild(svgImg); //add image to svg
-        this.svgImg = svgImg;
+    }
+
+    redrawImage(image) {
+        var oldWidth = this.screenWidth;
+        this.drawImg(image);
+        this.drawEllipses(oldWidth);
+    }
+
+    drawEllipses(oldWidth) {
+        var resize = this.screenWidth / oldWidth;
+        for (var i = 0; i < this.svgEllipses.length; i++) {
+            var ellipse = this.svgEllipses[i];
+
+            var newRX = ellipse.getAttributeNS(null, 'rx') * resize;
+            var newRY = ellipse.getAttributeNS(null, 'ry') * resize;
+            var newCX = ellipse.getAttributeNS(null, 'cx') * resize;
+            var newCY = ellipse.getAttributeNS(null, 'cy') * resize;
+
+            //set rx and ry
+            ellipse.setAttributeNS(null, 'rx', newRX);
+            ellipse.setAttributeNS(null, 'ry', newRY);
+            ellipse.setAttributeNS(null, 'cx', newCX);
+            ellipse.setAttributeNS(null, 'cy', newCY);
+
+        }
     }
 }
