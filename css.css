@@ -1,0 +1,60 @@
+body {
+    background-color: gray;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background: #c0ffee;
+}
+
+.svgContainer {
+    display: flex;
+    width: 100%;
+    justify-content: left;
+    padding: 0 20px;
+}
+
+.wide {
+    width: 100%;
+    text-align: left;
+    display: flex;
+}
+
+.button {
+    background: #69c;
+    color: #fff;
+    padding: 5px 10px;
+    border: 1px solid #7bb5ef;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"] + label {
+    padding: 5px 10px;
+}
+
+input[type="checkbox"]:checked + label {
+    background-color: #324b64;
+}
+
+
+@media screen and (max-width: 980px) {
+    .svgContainer {
+        justify-content: center;
+        padding: 0;
+    }
+}
+
+canvas, svg {
+    background-color: white;
+}
+
+#save {
+    cursor: pointer;
+}
