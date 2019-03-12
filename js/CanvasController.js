@@ -1,30 +1,33 @@
 class CanvasController {
-    constructor(canvasId, svgControllerInstance) {
+    constructor(canvasId, svgControllerInstance, widthLimit, heightLimit) {
         this.svgC = svgControllerInstance;
         this.canvas = document.getElementById(canvasId);
         this.canvasCtx = this.canvas.getContext('2d');
+
+        this.widthLimit = widthLimit;
+        this.heightLimit = heightLimit;
     }
 
-    drawAll(image, download) {
+    drawAll(image, download, name) {
         this.drawImg(image);
         this.drawEllipses();
 
         download.href = this.canvas.toDataURL('image/jpeg', 1.0);
-        download.download = "test.jpg";
+        download.download = name;
     }
 
     drawImg(image) {
         var imageHeight = image.height;
         var imageWidth = image.width;
 
-        if (imageWidth > ImageLimits.MAX_WIDTH) { //check width from original
-            imageHeight = (imageHeight / imageWidth) * ImageLimits.MAX_WIDTH;
-            imageWidth = ImageLimits.MAX_WIDTH;
+        if (imageWidth > this.widthLimit) { //check width from original
+            imageHeight = (imageHeight / imageWidth) * this.widthLimit;
+            imageWidth = this.widthLimit;
 
         }
-        if (imageHeight > ImageLimits.MAX_HEIGHT) { //check height from possibly smaller
-            imageWidth = (imageWidth / imageHeight) * ImageLimits.MAX_HEIGHT;
-            imageHeight = ImageLimits.MAX_HEIGHT;
+        if (imageHeight > this.heightLimit) { //check height from possibly smaller
+            imageWidth = (imageWidth / imageHeight) * this.heightLimit;
+            imageHeight = this.heightLimit;
 
         }
 

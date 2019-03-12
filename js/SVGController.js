@@ -17,11 +17,8 @@ class SVGController {
     }
 
     clear() {
-        var items = this.svg.childNodes;
-        for (var i = 0; i < items.length; i++) {
-            if (items[i].id !== "defs") {
-                items[i].remove();
-            }
+        for (var i = 0; i < this.svgEllipses.length; i++) {
+            this.svgEllipses[i].remove();
         }
         this.svgEllipses = [];
     }
@@ -36,7 +33,7 @@ class SVGController {
         this.calcWidth = coef * screenWidth;
         var calcHeight;
 
-        if(this.rotation === 0 || this.rotation === 180) {
+        if (this.rotation === 0 || this.rotation === 180) {
             calcHeight = image.height / image.width * coef * screenWidth;
             this.refreshXY(this.rotation, this.calcWidth, calcHeight);
 
@@ -62,8 +59,8 @@ class SVGController {
     }
 
     drawEllipses(oldWidth) {
-        console.log('old: ' + oldWidth );
-        console.log('new: ' + oldWidth );
+        console.log('old: ' + oldWidth);
+        console.log('new: ' + oldWidth);
         var resize = this.calcWidth / oldWidth;
         for (var i = 0; i < this.svgEllipses.length; i++) {
             var ellipse = this.svgEllipses[i];

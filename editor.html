@@ -43,14 +43,19 @@
 <script>
 
 var SVGInst = new SVGController('svg');
-var CanvasInst = new CanvasController('0000full',SVGInst);
+var canvases = [];
 
-var fileManagement = new FileManager(SVGInst, CanvasInst);
+canvases[0] = new CanvasController('0000full',SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
+canvases[1] = new CanvasController('0000thumb', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.THUMB_HEIGHT );
+canvases[2] = new CanvasController('0000mediumL', SVGInst, ImageLimits.MEDIUM_WIDTH, ImageLimits.MAX_HEIGHT );
+canvases[3] = new CanvasController('0000mediumP', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MEDIUM_HEIGHT );
+
+var fileManagement = new FileManager(SVGInst, canvases);
 var rotator = new Rotator(SVGInst);
-var blur = new BlurFace('blur', SVGInst);
+new BlurFace('blur', SVGInst);
 
 fileManagement.selectFile('load');
-fileManagement.saveImage('save', 'download');
+fileManagement.saveImage('save', 'download', '0000.jpg');
 
 rotator.setRotation("turnLeft", false);
 rotator.setRotation("turnRight", true);

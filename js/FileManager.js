@@ -1,7 +1,7 @@
 class FileManager {
-    constructor(svgControllerInstance, canvasControllerInstance) {
+    constructor(svgControllerInstance, canvasControllerInstances) {
         this.svgC = svgControllerInstance;
-        this.canvasC = canvasControllerInstance;
+        this.canvasesC = canvasControllerInstances;
         this.image = null;
     }
 
@@ -36,12 +36,14 @@ class FileManager {
         });
     }
 
-    saveImage(saveId, downloadId) {
+    saveImage(saveId, downloadId, fileName) {
         var save = document.getElementById(saveId);
         var download = document.getElementById(downloadId);
 
         save.addEventListener('click', () => {
-            this.canvasC.drawAll(this.image, download);
+            for(var i = 0; i < this.canvasesC.length; i++){
+                this.canvasesC[i].drawAll(this.image, download, fileName);
+            }
         });
     }
 }
