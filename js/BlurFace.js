@@ -2,13 +2,9 @@ class BlurFace {
     constructor(switchId, svgControllerInstance) {
         this.svgC = svgControllerInstance;
 
-        this.mouseX = 0;
-        this.mouseY = 0;
-
         this.on = false;
 
         this.listenToSwitch(switchId);
-        this.listenToMousePosition();
         this.addEllipse();
     }
 
@@ -16,23 +12,10 @@ class BlurFace {
         var blurFace = document.getElementById(blurId);
         blurFace.addEventListener('change', () => {
             this.on = blurFace.checked;
+            if(this.on) this.svgC.setCutOff();
         });
     }
 
-    listenToMousePosition() {
-        var mousePos = (event) => {
-
-            var rect = this.svgC.svg.getBoundingClientRect();
-            var position = {top: (rect.top), left: rect.left};
-
-            if (event.clientX) {
-                this.mouseX = event.clientX - position.left; //only clientX / -Y has same behavior on Firefox and Chrome
-                this.mouseY = event.clientY - position.top;
-            }
-        };
-        window.addEventListener('mousemove', mousePos);
-        window.addEventListener('scroll', mousePos);
-    }
 
     addEllipse() {
         this.ellipse = null;
@@ -66,8 +49,8 @@ class BlurFace {
             this.svgC.svg.appendChild(this.ellipse);
 
             //starting coordinates
-            this.startX = this.mouseX;
-            this.startY = this.mouseY;
+            this.startX = this.svgC.mouseX;
+            this.startY = this.svgC.mouseY;
 
             this.click = true;
 
@@ -82,12 +65,12 @@ class BlurFace {
             }
 
 
-            var width = Math.abs(this.startX - this.mouseX);
-            var height = Math.abs(this.startY - this.mouseY);
+            var width = Math.abs(this.startX - this.svgC.mouseX);
+            var height = Math.abs(this.startY - this.svgC.mouseY);
 
 
-            this.ellipse.setAttribute('cx', (this.startX + this.mouseX + 5) / 2); // '5' for blur edge
-            this.ellipse.setAttribute('cy', (this.startY + this.mouseY + 5) / 2);
+            this.ellipse.setAttribute('cx', (this.startX + this.svgC.mouseX + 5) / 2); // '5' for blur edge
+            this.ellipse.setAttribute('cy', (this.startY + this.svgC.mouseY + 5) / 2);
             this.ellipse.setAttribute('rx', width / 2);
             this.ellipse.setAttribute('ry', height / 2);
         });
@@ -107,6 +90,14 @@ class BlurFace {
                 return;
             }
             this.svgC.svgEllipses.push(this.ellipse);
+        });
+    }
+    setOff(buttonId, offButtonId) {
+        var button = document.getElementById(buttonId);
+        var offButton = document.getElementById(offButtonId);
+        offButton.addEventListener('click', () => {
+            button.checked = false;
+            this.on = false;
         });
     }
 }

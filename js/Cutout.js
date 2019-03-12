@@ -5,23 +5,36 @@ class Cutout {
         this.y = 0;
         this.minWidth = 0;
         this.minHeight = 0;
+
         this.leftCircle = null;
         this.rightCircle = null;
+        this.rect = null;
 
-        this.on = false;
+    }
+
+    setCutable(buttonId, width, height) {
+        var cutter = document.getElementById(buttonId);
+        cutter.addEventListener('click', () => {
+            if (!this.svgC.cutoutOn) {
+                this.makeCutout(width, height);
+                this.svgC.cutoutOn = true;
+            } else if (this.svgC.rectGroup != null) {
+                this.svgC.setCutOff();
+            }
+        })
     }
 
     makeCutout(width, height) {
         this.svgC.rectGroup = document.createElementNS(this.svgC.svgNS, 'g');
-        var rect = document.createElementNS(this.svgC.svgNS, 'rect');
-        rect.setAttributeNS(null, 'fill', 'rgba(192,192,192,0.3)');
-        rect.setAttributeNS(null, 'stroke', 'black');
-        rect.setAttributeNS(null, 'stroke-width', '2');
-        this.svgC.rectGroup.appendChild(rect);
+        this.rect = document.createElementNS(this.svgC.svgNS, 'rect');
+        this.rect.setAttributeNS(null, 'fill', 'rgba(192,192,192,0.3)');
+        this.rect.setAttributeNS(null, 'stroke', 'black');
+        this.rect.setAttributeNS(null, 'stroke-width', '2');
+        this.svgC.rectGroup.appendChild(this.rect);
         this.svgC.svg.appendChild(this.svgC.rectGroup);
 
-        var svgW = this.svgC.svg.style.width.replace('px', '');
-        var svgH = this.svgC.svg.style.height.replace('px', '');
+        var svgW = this.svgC.getSVGWidth();
+        var svgH = this.svgC.getSVGHeight();
 
         var minRatio = svgW / this.svgC.imageOriginalWidth;
 
@@ -36,27 +49,13 @@ class Cutout {
         this.x = (svgW - this.width) / 2;
         this.y = (svgH - this.height) / 2;
 
-        rect.setAttributeNS(null, 'x', this.x);
-        rect.setAttributeNS(null, 'y', this.y);
-        rect.setAttributeNS(null, 'height', this.height);
-        rect.setAttributeNS(null, 'width', this.width);
+        this.rect.setAttributeNS(null, 'x', this.x);
+        this.rect.setAttributeNS(null, 'y', this.y);
+        this.rect.setAttributeNS(null, 'width', this.width);
+        this.rect.setAttributeNS(null, 'height', this.height);
 
 
         this.addCircles(this.x, this.y, this.x + this.width, this.y + this.height);
-    }
-
-    setCutable(buttonId, width, height) {
-        var cutter = document.getElementById(buttonId);
-        cutter.addEventListener('click', () => {
-            if (!this.svgC.cutoutOn) {
-                this.makeCutout(width, height);
-                this.svgC.cutoutOn = true;
-            } else if (this.svgC.rectGroup != null) {
-                this.svgC.rectGroup.remove();
-                this.svgC.rectGroup = null;
-                this.svgC.cutoutOn = false;
-            }
-        })
     }
 
     addCircles(x1, y1, x2, y2) {
@@ -78,9 +77,133 @@ class Cutout {
         this.rightCircle.setAttribute('fill', 'grey');
         this.rightCircle.setAttribute('stroke', 'black');
 
+        this.setDraggable();
+
         circlesGroup.appendChild(this.leftCircle);
         circlesGroup.appendChild(this.rightCircle);
 
         this.svgC.rectGroup.appendChild(circlesGroup);
+    }
+
+
+    setDraggable() {
+        this.setDraggableC(this.leftCircle, this.rightCircle, false);
+        this.setDraggableC(this.rightCircle, this.leftCircle, true);
+        this.setDraggableR();
+    }
+
+    setDraggableC(circle, limitCircle, right) {
+        var start = false;
+        var x = 0,
+            y = 0;
+        var limitX = 0,
+            limitY = 0;
+
+        circle.addEventListener('mousedown', (event) => {
+            if (event.preventDefault) event.preventDefault();
+
+            x = circle.getAttributeNS(null, "cx");
+            y = circle.getAttributeNS(null, "cy");
+
+            limitX = parseInt(limitCircle.getAttributeNS(null, "cx"));
+            limitY = parseInt(limitCircle.getAttributeNS(null, "cy"));
+
+            if (right) {
+                limitX += this.minWidth;
+                limitY += this.minHeight;
+            } else {
+                limitX -= this.minWidth;
+                limitY -= this.minHeight;
+            }
+
+            start = true;
+
+        });
+        window.addEventListener('mousemove', () => {
+            if (start) {
+                var newX = this.svgC.mouseX;
+                var newY = this.svgC.mouseY;
+
+                if (right) {
+                    if (newX < limitX) newX = limitX;
+                    if (newY < limitY) newY = limitY;
+                    this.width = newX - this.x;
+                    this.height = newY - this.y;
+
+                } else {
+                    if (newX > limitX) newX = limitX;
+                    if (newY > limitY) newY = limitY;
+                    this.width += this.x - newX;
+                    this.height += this.y - newY;
+                    this.x = newX;
+                    this.y = newY;
+                    this.rect.setAttributeNS(null, 'x', newX);
+                    this.rect.setAttributeNS(null, 'y', this.y);
+                }
+
+
+                this.rect.setAttributeNS(null, 'width', this.width);
+                this.rect.setAttributeNS(null, 'height', this.height);
+
+                circle.setAttributeNS(null, 'cx', newX);
+                circle.setAttributeNS(null, 'cy', newY);
+
+            }
+        });
+        this.svgC.svg.addEventListener('mouseup', () => {
+            start = false
+        });
+        this.svgC.svg.addEventListener('mouseleave', () => {
+            start = false
+        });
+    }
+
+    setDraggableR() {
+        var start = false;
+        var startX = 0,
+            startY = 0;
+        var startRectX = 0,
+            startRectY = 0;
+
+        this.rect.addEventListener('mousedown', (event) => {
+            if (event.preventDefault) event.preventDefault();
+            startX = this.svgC.mouseX;
+            startY = this.svgC.mouseY;
+
+            startRectX = this.x;
+            startRectY = this.y;
+
+            start = true;
+
+        });
+        window.addEventListener('mousemove', () => {
+            if (start) {
+                var endX = this.svgC.mouseX;
+                var endY = this.svgC.mouseY;
+
+                var newX = startRectX + (endX - startX);
+                var newY = startRectY + (endY - startY);
+
+                if (newX < 0) newX = 0;
+                if (newX > this.svgC.getSVGWidth() - this.width) newX = this.svgC.getSVGWidth() - this.width;
+                if (newY < 0) newY = 0;
+                if (newY > this.svgC.getSVGHeight() - this.height) newY = this.svgC.getSVGHeight() - this.height;
+
+                this.rect.setAttributeNS(null, 'x', newX);
+                this.rect.setAttributeNS(null, 'y', newY);
+                this.leftCircle.setAttributeNS(null, 'cx', newX);
+                this.leftCircle.setAttributeNS(null, 'cy', newY);
+                this.rightCircle.setAttributeNS(null, 'cx', newX + this.width);
+                this.rightCircle.setAttributeNS(null, 'cy', newY + this.height);
+                this.x = newX;
+                this.y = newY;
+            }
+        });
+        this.svgC.svg.addEventListener('mouseup', () => {
+            start = false
+        });
+        this.svgC.svg.addEventListener('mouseleave', () => {
+            start = false
+        });
     }
 }

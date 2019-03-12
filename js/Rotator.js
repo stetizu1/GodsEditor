@@ -8,6 +8,8 @@ class Rotator {
         var button = document.getElementById(buttonId);
         var degrees = right ? 90 : 270;
         button.addEventListener('click', () => {
+            this.svgC.setCutOff();
+
             this.right = right;
             if (this.svgC.svgImg === null) return;
             this.svgC.rotation += degrees;

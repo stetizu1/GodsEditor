@@ -66,7 +66,7 @@ canvases[3] = new CanvasController('0000mediumP', 'downloadMediumP', '0000mp.jpg
 
 var cutout = new Cutout(SVGInst);
 var rotator = new Rotator(SVGInst);
-new BlurFace('blur', SVGInst);
+var blur = new BlurFace('blur', SVGInst);
 var fileManagement = new FileManager(SVGInst, canvases);
 
 
@@ -77,6 +77,8 @@ rotator.setRotation("turnLeft", false);
 rotator.setRotation("turnRight", true);
 
 cutout.setCutable('titleBig', 88, 66);
+blur.setOff('blur', 'titleBig');
+
 
 
 </script>

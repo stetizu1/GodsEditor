@@ -3,6 +3,10 @@ class SVGController {
         this.svg = document.getElementById(svgId);
         this.svgNS = "http://www.w3.org/2000/svg";
 
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.listenToMousePosition();
+
         this.initImage();
 
         this.svgEllipses = [];
@@ -15,6 +19,21 @@ class SVGController {
         this.imageOriginalWidth = 0;
 
         this.cutoutOn = false;
+    }
+
+    listenToMousePosition() {
+        var mousePos = (event) => {
+
+            var rect = this.svg.getBoundingClientRect();
+            var position = {top: (rect.top), left: rect.left};
+
+            if (event.clientX) {
+                this.mouseX = event.clientX - position.left; //only clientX / -Y has same behavior on Firefox and Chrome
+                this.mouseY = event.clientY - position.top;
+            }
+        };
+        window.addEventListener('mousemove', mousePos);
+        window.addEventListener('scroll', mousePos);
     }
 
     initImage() {
@@ -30,13 +49,15 @@ class SVGController {
         for (var i = 0; i < this.svgEllipses.length; i++) {
             this.svgEllipses[i].remove();
         }
-        if (this.rectGroup != null) {
-            this.rectGroup.remove();
-        }
+        this.setCutOff();
 
-        this.rectGroup = null;
+        //reset attributes of img
+        this.rotation = 0;
+        this.svgImg.setAttributeNS(null, 'x', '0');
+        this.svgImg.setAttributeNS(null, 'y', '0');
+        this.svgImg.setAttribute('transform', 'rotate(0)');
+
         this.svgEllipses = [];
-        this.cutoutOn = false;
     }
 
     redrawImage(image) {
@@ -121,5 +142,21 @@ class SVGController {
 
         this.svgImg.setAttributeNS(null, 'width', width); //firefox
         this.svgImg.setAttributeNS(null, 'height', height); //firefox
+    }
+
+    getSVGWidth() {
+        return parseInt(this.svg.style.width.replace('px', ''));
+    }
+
+    getSVGHeight() {
+        return parseInt(this.svg.style.height.replace('px', ''));
+    }
+
+    setCutOff() {
+        if (this.rectGroup != null) {
+            this.rectGroup.remove();
+            this.rectGroup = null;
+            this.cutoutOn = false;
+        }
     }
 }
