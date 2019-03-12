@@ -1,19 +1,24 @@
 class CanvasController {
-    constructor(canvasId, svgControllerInstance, widthLimit, heightLimit) {
-        this.svgC = svgControllerInstance;
+    constructor(canvasId, downloadId, fileName, svgControllerInstance, widthLimit, heightLimit) {
         this.canvas = document.getElementById(canvasId);
         this.canvasCtx = this.canvas.getContext('2d');
+
+        this.downloadId = downloadId;
+        this.fileName = fileName;
+
+        this.svgC = svgControllerInstance;
 
         this.widthLimit = widthLimit;
         this.heightLimit = heightLimit;
     }
 
-    drawAll(image, download, name) {
+    drawAll(image) {
         this.drawImg(image);
         this.drawEllipses();
 
-        download.href = this.canvas.toDataURL('image/jpeg', 1.0);
-        download.download = name;
+        var downloadButton = document.getElementById(this.downloadId);
+        downloadButton.href = this.canvas.toDataURL('image/jpeg', 1.0);
+        downloadButton.download = this.fileName;
     }
 
     drawImg(image) {
@@ -70,8 +75,6 @@ class CanvasController {
         var canvasHeight = this.canvas.height;
 
         var ratio = canvasWidth / svgWidth;
-
-        console.log(this.svgC.svgEllipses);
 
         for (var i = 0; i < this.svgC.svgEllipses.length; i++) {
             var ellipse = this.svgC.svgEllipses[i];

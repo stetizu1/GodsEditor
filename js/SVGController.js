@@ -59,8 +59,6 @@ class SVGController {
     }
 
     drawEllipses(oldWidth) {
-        console.log('old: ' + oldWidth);
-        console.log('new: ' + oldWidth);
         var resize = this.calcWidth / oldWidth;
         for (var i = 0; i < this.svgEllipses.length; i++) {
             var ellipse = this.svgEllipses[i];

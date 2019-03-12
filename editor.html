@@ -30,7 +30,10 @@
 
 </div>
 <button id="save" class="button wide">Uložit</button>
-<a id="download" class="button wide">Stáhnout</a>
+<a id="downloadFull" class="button wide">Stáhnout full</a>
+<a id="downloadThumb" class="button wide">Stáhnout thumb</a>
+<a id="downloadMediumL" class="button wide">Stáhnout medium landscape</a>
+<a id="downloadMediumP" class="button wide">Stáhnout medium portrait</a>
 
 <script src="js/settings/ImageLimits.js"></script>
 <script src="js/settings/Messages.js"></script>
@@ -45,17 +48,17 @@
 var SVGInst = new SVGController('svg');
 var canvases = [];
 
-canvases[0] = new CanvasController('0000full',SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
-canvases[1] = new CanvasController('0000thumb', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.THUMB_HEIGHT );
-canvases[2] = new CanvasController('0000mediumL', SVGInst, ImageLimits.MEDIUM_WIDTH, ImageLimits.MAX_HEIGHT );
-canvases[3] = new CanvasController('0000mediumP', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MEDIUM_HEIGHT );
+canvases[0] = new CanvasController('0000full', 'downloadFull', '0000.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
+canvases[1] = new CanvasController('0000thumb', 'downloadThumb', '0000t.jpg',  SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.THUMB_HEIGHT );
+canvases[2] = new CanvasController('0000mediumL', 'downloadMediumL', '0000ml.jpg', SVGInst, ImageLimits.MEDIUM_WIDTH, ImageLimits.MAX_HEIGHT );
+canvases[3] = new CanvasController('0000mediumP', 'downloadMediumP', '0000mp.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MEDIUM_HEIGHT );
 
 var fileManagement = new FileManager(SVGInst, canvases);
 var rotator = new Rotator(SVGInst);
 new BlurFace('blur', SVGInst);
 
 fileManagement.selectFile('load');
-fileManagement.saveImage('save', 'download', '0000.jpg');
+fileManagement.saveImage('save');
 
 rotator.setRotation("turnLeft", false);
 rotator.setRotation("turnRight", true);

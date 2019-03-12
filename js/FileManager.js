@@ -36,13 +36,12 @@ class FileManager {
         });
     }
 
-    saveImage(saveId, downloadId, fileName) {
+    saveImage(saveId) {
         var save = document.getElementById(saveId);
-        var download = document.getElementById(downloadId);
 
         save.addEventListener('click', () => {
             for(var i = 0; i < this.canvasesC.length; i++){
-                this.canvasesC[i].drawAll(this.image, download, fileName);
+                this.canvasesC[i].drawAll(this.image);
             }
         });
     }
