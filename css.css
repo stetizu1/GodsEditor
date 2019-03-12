@@ -55,6 +55,6 @@ canvas, svg {
     background-color: white;
 }
 
-#save {
+#save, .cutout > * {
     cursor: pointer;
 }

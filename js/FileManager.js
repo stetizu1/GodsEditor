@@ -24,7 +24,7 @@ class FileManager {
                     this.svgC.rotation = 0;
                     this.svgC.clear(); //clear old image
                     this.svgC.drawImg(this.image);
-                    window.addEventListener('resize', () =>{
+                    window.addEventListener('resize', () => {
                         this.svgC.redrawImage(this.image);
                     });
                 };
@@ -40,7 +40,7 @@ class FileManager {
         var save = document.getElementById(saveId);
 
         save.addEventListener('click', () => {
-            for(var i = 0; i < this.canvasesC.length; i++){
+            for (var i = 0; i < this.canvasesC.length; i++) {
                 this.canvasesC[i].drawAll(this.image);
             }
         });

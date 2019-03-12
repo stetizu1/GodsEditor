@@ -9,7 +9,9 @@
 <body>
 <input type="file" class="wide" id="load">
 <div class="tools wide">
-    <input type="checkbox" name="tool" id="blur" value="blur"><label for="blur" class="button"> Rozmazání obličeje </label>
+    <input type="checkbox" name="tool" id="blur" value="blur">
+    <label for="blur" class="button"> Rozmazání obličeje </label>
+
     <button id="turnLeft" class="button">Otočit vlevo</button>
     <button id="turnRight" class="button">Otočit vpravo</button>
 </div>
@@ -22,11 +24,18 @@
         </defs>
     </svg>
 </div>
+<div class="cutout wide">
+    <button id="titleBig" class="button wide">88x66</button>
+    <button id="titleSmall" class="button wide">50x50</button>
+    <button id="portBig" class="button wide">200x300</button>
+    <button id="portSmall" class="button wide">180x260</button>
+    <button id="landscape" class="button wide">200x150</button>
+</div>
 <div class="canvasContainer">
-<canvas id="0000full" class="full0"></canvas>
-<canvas id="0000thumb" class="thumb"></canvas>
-<canvas id="0000mediumL" class="medium landscape"></canvas>
-<canvas id="0000mediumP" class="medium portrait"></canvas>
+    <canvas id="0000full" class="full0"></canvas>
+    <canvas id="0000thumb" class="thumb"></canvas>
+    <canvas id="0000mediumL" class="medium landscape"></canvas>
+    <canvas id="0000mediumP" class="medium portrait"></canvas>
 
 </div>
 <button id="save" class="button wide">Uložit</button>
@@ -43,6 +52,7 @@
 <script src="js/CanvasController.js"></script>
 <script src="js/Rotator.js"></script>
 <script src="js/BlurFace.js"></script>
+<script src="js/Cutout.js"></script>
 <script>
 
 var SVGInst = new SVGController('svg');
@@ -53,15 +63,20 @@ canvases[1] = new CanvasController('0000thumb', 'downloadThumb', '0000t.jpg',  S
 canvases[2] = new CanvasController('0000mediumL', 'downloadMediumL', '0000ml.jpg', SVGInst, ImageLimits.MEDIUM_WIDTH, ImageLimits.MAX_HEIGHT );
 canvases[3] = new CanvasController('0000mediumP', 'downloadMediumP', '0000mp.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MEDIUM_HEIGHT );
 
-var fileManagement = new FileManager(SVGInst, canvases);
+
+var cutout = new Cutout(SVGInst);
 var rotator = new Rotator(SVGInst);
 new BlurFace('blur', SVGInst);
+var fileManagement = new FileManager(SVGInst, canvases);
+
 
 fileManagement.selectFile('load');
 fileManagement.saveImage('save');
 
 rotator.setRotation("turnLeft", false);
 rotator.setRotation("turnRight", true);
+
+cutout.setCutable('titleBig', 88, 66);
 
 
 </script>

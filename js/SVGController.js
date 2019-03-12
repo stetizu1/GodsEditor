@@ -3,28 +3,52 @@ class SVGController {
         this.svg = document.getElementById(svgId);
         this.svgNS = "http://www.w3.org/2000/svg";
 
+        this.initImage();
+
+        this.svgEllipses = [];
+        this.rectGroup = null;
+
+        this.rotation = 0;
+        this.x = '0';
+        this.y = '0';
+        this.imageOriginalHeight = 0;
+        this.imageOriginalWidth = 0;
+
+        this.cutoutOn = false;
+    }
+
+    initImage() {
         //init img
         this.svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.svgImg.setAttributeNS(null, 'x', '0');
         this.svgImg.setAttributeNS(null, 'y', '0');
         this.svgImg.setAttributeNS(null, 'visibility', 'visible');
         this.svg.appendChild(this.svgImg); //add image to svg
-
-        this.svgEllipses = [];
-        this.rotation = 0;
-        this.x = '0';
-        this.y = '0';
     }
 
     clear() {
         for (var i = 0; i < this.svgEllipses.length; i++) {
             this.svgEllipses[i].remove();
         }
+        if (this.rectGroup != null) {
+            this.rectGroup.remove();
+        }
+
+        this.rectGroup = null;
         this.svgEllipses = [];
+        this.cutoutOn = false;
+    }
+
+    redrawImage(image) {
+        var oldWidth = this.calcWidth;
+        this.drawImg(image);
+        this.drawEllipses(oldWidth);
     }
 
     drawImg(image) {
         this.svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image.src);
+        this.imageOriginalWidth = image.width;
+        this.imageOriginalHeight = image.height;
 
         //small screens
         var screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
@@ -50,12 +74,6 @@ class SVGController {
             this.setWidthAndHeight(calcHeight, this.calcWidth);
         }
 
-    }
-
-    redrawImage(image) {
-        var oldWidth = this.calcWidth;
-        this.drawImg(image);
-        this.drawEllipses(oldWidth);
     }
 
     drawEllipses(oldWidth) {

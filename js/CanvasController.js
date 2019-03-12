@@ -88,14 +88,11 @@ class CanvasController {
             this.canvasCtx.beginPath();
             if (this.svgC.rotation === 0) {
                 this.canvasCtx.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
-            }
-            else if(this.svgC.rotation === 90){
+            } else if (this.svgC.rotation === 90) {
                 this.canvasCtx.ellipse(cy, canvasWidth - cx, ry, rx, 0, 0, 2 * Math.PI);
-            }
-            else if(this.svgC.rotation === 180){
+            } else if (this.svgC.rotation === 180) {
                 this.canvasCtx.ellipse(canvasWidth - cx, canvasHeight - cy, rx, ry, 0, 0, 2 * Math.PI);
-            }
-            else if(this.svgC.rotation === 270){
+            } else if (this.svgC.rotation === 270) {
                 this.canvasCtx.ellipse(canvasHeight - cy, cx, ry, rx, 0, 0, 2 * Math.PI);
             }
             this.canvasCtx.stroke();

@@ -56,7 +56,7 @@ class BlurFace {
 
             var el = this.ellipse;
             el.addEventListener("dblclick", () => {
-                if (!this.on){
+                if (!this.on) {
                     return;
                 }
                 el.remove();
