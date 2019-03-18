@@ -5,6 +5,7 @@ class Cutout {
         this.y = 0;
         this.minWidth = 0;
         this.minHeight = 0;
+        this.ratio = 1;
 
         this.leftCircle = null;
         this.rightCircle = null;
@@ -18,6 +19,7 @@ class Cutout {
             if (!this.svgC.cutoutOn) {
                 this.makeCutout(width, height);
                 this.svgC.cutoutOn = true;
+                this.ratio = width / height;
             } else if (this.svgC.rectGroup != null) {
                 this.svgC.setCutOff();
             }
@@ -129,18 +131,35 @@ class Cutout {
                     if (newY < limitY) newY = limitY;
                     this.width = newX - this.x;
                     this.height = newY - this.y;
+                    if (this.width / this.height > this.ratio) {
+                        this.width = this.ratio * this.height;
+                    } else {
+                        this.height = (1 / this.ratio) * this.width;
+                    }
+                    newX = this.x + this.width;
+                    newY = this.y + this.height;
 
                 } else {
                     if (newX > limitX) newX = limitX;
                     if (newY > limitY) newY = limitY;
                     this.width += this.x - newX;
                     this.height += this.y - newY;
+
+                    if (this.width / this.height > this.ratio) {
+                        newX += this.width;
+                        this.width = this.ratio * this.height;
+                        newX -= this.width;
+                    } else {
+                        newY += this.height;
+                        this.height = (1 / this.ratio) * this.width;
+                        newY -= this.height;
+                    }
+
                     this.x = newX;
                     this.y = newY;
                     this.rect.setAttributeNS(null, 'x', newX);
                     this.rect.setAttributeNS(null, 'y', this.y);
                 }
-
 
                 this.rect.setAttributeNS(null, 'width', this.width);
                 this.rect.setAttributeNS(null, 'height', this.height);
