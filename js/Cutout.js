@@ -16,12 +16,23 @@ class Cutout {
     setCutable(buttonId, width, height) {
         var cutter = document.getElementById(buttonId);
         cutter.addEventListener('click', () => {
-            if (!this.svgC.cutoutOn) {
+            if (this.svgC.imageOriginalHeight === 0) return;
+
+            if (this.svgC.cutoutOn) {
+                if (this.svgC.rectGroup != null) {
+                    this.svgC.setCutOff();
+                }
+                if (this.id !== buttonId) {
+                    this.makeCutout(width, height);
+                    this.svgC.cutoutOn = true;
+                    this.ratio = width / height;
+                    this.id = buttonId;
+                }
+            } else {
                 this.makeCutout(width, height);
                 this.svgC.cutoutOn = true;
                 this.ratio = width / height;
-            } else if (this.svgC.rectGroup != null) {
-                this.svgC.setCutOff();
+                this.id = buttonId;
             }
         })
     }
