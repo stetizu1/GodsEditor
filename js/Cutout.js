@@ -1,11 +1,14 @@
 class Cutout {
-    constructor(svgControllerInstance) {
+    constructor(svgControllerInstance, canvasControllerInstance) {
         this.svgC = svgControllerInstance;
+        this.canvasC = canvasControllerInstance;
         this.x = 0;
         this.y = 0;
         this.minWidth = 0;
         this.minHeight = 0;
-        this.ratio = 1;
+        this.minRatio = 1;
+        this.maxRatio = 1;
+
 
         this.leftCircle = null;
         this.rightCircle = null;
@@ -13,9 +16,10 @@ class Cutout {
 
     }
 
-    setCutable(buttonId, width, height) {
+    setCutable(buttonId, minWidth, height, maxWidth) {
         var cutter = document.getElementById(buttonId);
         cutter.addEventListener('click', () => {
+
             if (this.svgC.imageOriginalHeight === 0) return;
 
             if (this.svgC.cutoutOn) {
@@ -23,15 +27,17 @@ class Cutout {
                     this.svgC.setCutOff();
                 }
                 if (this.id !== buttonId) {
-                    this.makeCutout(width, height);
+                    this.makeCutout(minWidth, height);
                     this.svgC.cutoutOn = true;
-                    this.ratio = width / height;
+                    this.minRatio = minWidth / height;
+                    this.maxRatio = maxWidth / height;
                     this.id = buttonId;
                 }
             } else {
-                this.makeCutout(width, height);
+                this.makeCutout(minWidth, height);
                 this.svgC.cutoutOn = true;
-                this.ratio = width / height;
+                this.minRatio = minWidth / height;
+                this.maxRatio = maxWidth / height;
                 this.id = buttonId;
             }
         })
@@ -142,10 +148,10 @@ class Cutout {
                     if (newY < limitY) newY = limitY;
                     this.width = newX - this.x;
                     this.height = newY - this.y;
-                    if (this.width / this.height > this.ratio) {
-                        this.width = this.ratio * this.height;
-                    } else {
-                        this.height = (1 / this.ratio) * this.width;
+                    if (this.width / this.height > this.maxRatio) {
+                        this.width = this.maxRatio * this.height;
+                    } else if (this.width / this.height < this.minRatio){
+                        this.height = (1 / this.minRatio) * this.width;
                     }
                     newX = this.x + this.width;
                     newY = this.y + this.height;
@@ -156,13 +162,13 @@ class Cutout {
                     this.width += this.x - newX;
                     this.height += this.y - newY;
 
-                    if (this.width / this.height > this.ratio) {
+                    if (this.width / this.height > this.maxRatio) {
                         newX += this.width;
-                        this.width = this.ratio * this.height;
+                        this.width = this.maxRatio * this.height;
                         newX -= this.width;
-                    } else {
+                    } else if (this.width / this.height < this.minRatio) {
                         newY += this.height;
-                        this.height = (1 / this.ratio) * this.width;
+                        this.height = (1 / this.minRatio) * this.width;
                         newY -= this.height;
                     }
 

@@ -7,43 +7,45 @@
     <link rel="stylesheet" href="css.css">
 </head>
 <body>
-<input type="file" class="wide" id="load">
-<div class="tools wide">
-    <input type="checkbox" name="tool" id="blur" value="blur">
-    <label for="blur" class="button"> Rozmazání obličeje </label>
 
-    <button id="turnLeft" class="button">Otočit vlevo</button>
-    <button id="turnRight" class="button">Otočit vpravo</button>
-</div>
-<div class="svgContainer">
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg">
-        <defs id="defs">
-            <filter id="blurFilter" y="-5" height="40">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="3" y="-5"/>
-            </filter>
-        </defs>
-    </svg>
-</div>
-<div class="cutout wide">
-    <button id="titleBig" class="button wide">88x66</button>
-    <button id="titleSmall" class="button wide">50x50</button>
-    <button id="portBig" class="button wide">200x300</button>
-    <button id="portSmall" class="button wide">180x260</button>
-    <button id="landscape" class="button wide">200x150</button>
-</div>
-<div class="canvasContainer">
-    <canvas id="0000full" class="full0"></canvas>
-    <canvas id="0000thumb" class="thumb"></canvas>
-    <canvas id="0000mediumL" class="medium landscape"></canvas>
-    <canvas id="0000mediumP" class="medium portrait"></canvas>
+<div class="editor">
+    <input type="file" class="wide" id="load">
+    <div class="tools wide">
+
+        <button id="cutout" class="button">Upravit výřez</button>
+
+        <input type="checkbox" name="tool" id="blur" value="blur">
+        <label for="blur" class="button"> Rozmazání obličeje </label>
+
+        <button id="turnLeft" class="button">Otočit vlevo</button>
+        <button id="turnRight" class="button">Otočit vpravo</button>
+    </div>
+    <div class="svgContainer">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg">
+            <defs id="defs">
+                <filter id="blurFilter" y="-5" height="40">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="3" y="-5"/>
+                </filter>
+            </defs>
+        </svg>
+    </div>
+    <div class="cutout wide">
+        <button id="titleSmall" class="button wide">50x50</button>
+        <button id="landscape" class="button wide">200x150</button>
+        <button id="portBig" class="button wide">200x300</button>
+        <button id="portSmall" class="button wide">180x260</button>
+    </div>
+    <div class="canvasContainer">
+        <canvas id="0000full" class="full0"></canvas>
+        <canvas id="0000cutout" class="cutout"></canvas>
+
+    </div>
+    <button id="save" class="button wide">Uložit</button>
+    <a id="downloadFull" class="button wide">Stáhnout full</a>
+    <a id="downloadCutout" class="button wide">Stáhnout výřez</a>
+    <input type="file" class="wide" id="saved">
 
 </div>
-<button id="save" class="button wide">Uložit</button>
-<a id="downloadFull" class="button wide">Stáhnout full</a>
-<a id="downloadThumb" class="button wide">Stáhnout thumb</a>
-<a id="downloadMediumL" class="button wide">Stáhnout medium landscape</a>
-<a id="downloadMediumP" class="button wide">Stáhnout medium portrait</a>
-
 <script src="js/settings/ImageLimits.js"></script>
 <script src="js/settings/Messages.js"></script>
 
@@ -59,12 +61,11 @@ var SVGInst = new SVGController('svg');
 var canvases = [];
 
 canvases[0] = new CanvasController('0000full', 'downloadFull', '0000.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
-canvases[1] = new CanvasController('0000thumb', 'downloadThumb', '0000t.jpg',  SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.THUMB_HEIGHT );
-canvases[2] = new CanvasController('0000mediumL', 'downloadMediumL', '0000ml.jpg', SVGInst, ImageLimits.MEDIUM_WIDTH, ImageLimits.MAX_HEIGHT );
-canvases[3] = new CanvasController('0000mediumP', 'downloadMediumP', '0000mp.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MEDIUM_HEIGHT );
+
+var canvasInst = new CanvasController('0000cutout', 'downloadCutout', '0000c.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT );
 
 
-var cutout = new Cutout(SVGInst);
+var cutout = new Cutout(SVGInst, canvasInst);
 var rotator = new Rotator(SVGInst);
 var blur = new BlurFace('blur', SVGInst);
 var fileManagement = new FileManager(SVGInst, canvases);
@@ -76,12 +77,13 @@ fileManagement.saveImage('save');
 rotator.setRotation("turnLeft", false);
 rotator.setRotation("turnRight", true);
 
-cutout.setCutable('titleBig', 88, 66);
-cutout.setCutable('titleSmall', 50, 50);
-cutout.setCutable('portBig', 200, 300);
-cutout.setCutable('portSmall', 180, 260);
-cutout.setCutable('landscape', 200, 150);
-blur.setOff('blur', 'titleBig');
+cutout.setCutable('cutout', 320, 480, 640);
+cutout.setCutable('titleSmall', 50, 50, 50);
+cutout.setCutable('portBig', 200, 300, 200);
+cutout.setCutable('portSmall', 180, 260, 180);
+cutout.setCutable('landscape', 200, 150, 200);
+
+blur.setOff('blur', 'cutout');
 blur.setOff('blur', 'titleSmall');
 blur.setOff('blur', 'portBig');
 blur.setOff('blur', 'portSmall');

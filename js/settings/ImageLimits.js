@@ -1,7 +1,9 @@
-const MAX_WIDTH = 3000,
+const
+    MAX_WIDTH = 3000,
     MAX_HEIGHT = 3000,
-    MIN_WIDTH = 200,
-    MIN_HEIGHT = 200,
+    //same as smallest cutout
+    MIN_WIDTH = 320,
+    MIN_HEIGHT = 480,
     THUMB_HEIGHT = 66,
     MEDIUM_WIDTH = 640,
     MEDIUM_HEIGHT = 480;
