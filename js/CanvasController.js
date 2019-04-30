@@ -28,12 +28,10 @@ class CanvasController {
         if (imageWidth > this.widthLimit) { //check width from original
             imageHeight = (imageHeight / imageWidth) * this.widthLimit;
             imageWidth = this.widthLimit;
-
         }
         if (imageHeight > this.heightLimit) { //check height from possibly smaller
             imageWidth = (imageWidth / imageHeight) * this.heightLimit;
             imageHeight = this.heightLimit;
-
         }
 
 

@@ -1,7 +1,5 @@
 body {
     background-color: gray;
-    display: flex;
-    flex-wrap: wrap;
 }
 
 * {
@@ -14,6 +12,8 @@ body {
 
 .editor{
     width: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 .svgContainer {
     display: flex;
@@ -56,9 +56,25 @@ input[type="checkbox"]:checked + label {
 }
 
 canvas, svg {
-    background-color: white;
+    background-color: white; /*todo delete*/
 }
 
 #save, .cutout > * {
     cursor: pointer;
+}
+
+#gallery {
+    width: 100%;
+    margin-bottom: 20px;
+}
+#gallery .galleryItem{
+    height: 144px;
+    width: 192px; /*todo dopocitat podle vyrezu*/
+    overflow: hidden;
+    position: relative;
+}
+#gallery .galleryItem canvas {
+    position: absolute;
+    top: 0; /*todo dopocitat podle vyrezu*/
+    left: 0; /*todo dopocitat podle vyrezu*/
 }

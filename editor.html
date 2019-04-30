@@ -29,21 +29,29 @@
             </defs>
         </svg>
     </div>
+    <div class="confirm">
+        <button id="cutoutConfirm" class="button">Potvrdit výřez</button>
+        <div style="height: 20px"></div>
+    </div>
+
     <div class="cutout wide">
         <button id="titleSmall" class="button wide">50x50</button>
         <button id="landscape" class="button wide">200x150</button>
         <button id="portBig" class="button wide">200x300</button>
         <button id="portSmall" class="button wide">180x260</button>
     </div>
-    <div class="canvasContainer">
+    <div class="canvasContainer" style="visibility: hidden; position: absolute; z-index: -1000;">
         <canvas id="0000full" class="full0"></canvas>
-        <canvas id="0000cutout" class="cutout"></canvas>
-
     </div>
     <button id="save" class="button wide">Uložit</button>
     <a id="downloadFull" class="button wide">Stáhnout full</a>
-    <a id="downloadCutout" class="button wide">Stáhnout výřez</a>
-    <input type="file" class="wide" id="saved">
+
+
+    <div id="gallery">
+        <div class="galleryItem">
+            <canvas id="0000cutout" class="cutout"></canvas>
+        </div>
+    </div>
 
 </div>
 <script src="js/settings/ImageLimits.js"></script>
@@ -59,28 +67,32 @@
 
 var SVGInst = new SVGController('svg');
 var canvases = [];
+var galleryCanvases = [];
+
 
 canvases[0] = new CanvasController('0000full', 'downloadFull', '0000.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
+galleryCanvases[0] = new CanvasController('0000cutout', 'downloadCutout', '0000c.jpg', SVGInst, ImageLimits.MIN_WIDTH, ImageLimits.MIN_HEIGHT );
 
-var canvasInst = new CanvasController('0000cutout', 'downloadCutout', '0000c.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT );
 
-
-var cutout = new Cutout(SVGInst, canvasInst);
+var cutout = new Cutout(SVGInst, "cutoutConfirm");
 var rotator = new Rotator(SVGInst);
 var blur = new BlurFace('blur', SVGInst);
 var fileManagement = new FileManager(SVGInst, canvases);
+var cutoutFileManagement = new FileManager(SVGInst, galleryCanvases);
 
 
 fileManagement.selectFile('load');
+cutoutFileManagement.selectFile('load');
+
 fileManagement.saveImage('save');
+cutoutFileManagement.saveImage('cutoutConfirm');
 
 rotator.setRotation("turnLeft", false);
 rotator.setRotation("turnRight", true);
 
 cutout.setCutable('cutout', 320, 480, 640);
-cutout.setCutable('titleSmall', 50, 50, 50);
+
 cutout.setCutable('portBig', 200, 300, 200);
-cutout.setCutable('portSmall', 180, 260, 180);
 cutout.setCutable('landscape', 200, 150, 200);
 
 blur.setOff('blur', 'cutout');
@@ -88,8 +100,6 @@ blur.setOff('blur', 'titleSmall');
 blur.setOff('blur', 'portBig');
 blur.setOff('blur', 'portSmall');
 blur.setOff('blur', 'landscape');
-
-
 
 </script>
 </body>

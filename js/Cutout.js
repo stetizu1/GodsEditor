@@ -1,7 +1,8 @@
 class Cutout {
-    constructor(svgControllerInstance, canvasControllerInstance) {
+    constructor(svgControllerInstance, confirmButtonId) {
         this.svgC = svgControllerInstance;
-        this.canvasC = canvasControllerInstance;
+        this.confirm = document.getElementById(confirmButtonId);
+
         this.x = 0;
         this.y = 0;
         this.minWidth = 0;
@@ -9,31 +10,28 @@ class Cutout {
         this.minRatio = 1;
         this.maxRatio = 1;
 
-
         this.leftCircle = null;
         this.rightCircle = null;
         this.rect = null;
+
+        this.confirm.addEventListener('click', () => {
+            if (this.svgC.cutoutOn) {
+
+            }
+        })
 
     }
 
     setCutable(buttonId, minWidth, height, maxWidth) {
         var cutter = document.getElementById(buttonId);
         cutter.addEventListener('click', () => {
-
             if (this.svgC.imageOriginalHeight === 0) return;
 
-            if (this.svgC.cutoutOn) {
-                if (this.svgC.rectGroup != null) {
-                    this.svgC.setCutOff();
-                }
-                if (this.id !== buttonId) {
-                    this.makeCutout(minWidth, height);
-                    this.svgC.cutoutOn = true;
-                    this.minRatio = minWidth / height;
-                    this.maxRatio = maxWidth / height;
-                    this.id = buttonId;
-                }
-            } else {
+            if (this.svgC.cutoutOn && this.svgC.rectGroup != null) {
+                this.svgC.setCutOff();
+            }
+
+            if (!this.svgC.cutoutOn || this.id !== buttonId) {
                 this.makeCutout(minWidth, height);
                 this.svgC.cutoutOn = true;
                 this.minRatio = minWidth / height;
@@ -150,7 +148,7 @@ class Cutout {
                     this.height = newY - this.y;
                     if (this.width / this.height > this.maxRatio) {
                         this.width = this.maxRatio * this.height;
-                    } else if (this.width / this.height < this.minRatio){
+                    } else if (this.width / this.height < this.minRatio) {
                         this.height = (1 / this.minRatio) * this.width;
                     }
                     newX = this.x + this.width;
