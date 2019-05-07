@@ -1,8 +1,9 @@
 class FileManager {
-    constructor(svgControllerInstance, canvasControllerInstances) {
+    constructor(svgControllerInstance, canvasControllerInstance, main) {
         this.svgC = svgControllerInstance;
-        this.canvasesC = canvasControllerInstances;
+        this.canvasC = canvasControllerInstance;
         this.image = null;
+        this.mainInstance = main;
     }
 
     selectFile(inputId) {
@@ -17,7 +18,7 @@ class FileManager {
                 this.image = new Image();
                 this.image.onload = () => { //set attributes for svg image
                     if (this.image.width < ImageLimits.MIN_WIDTH || this.image.height < ImageLimits.MIN_HEIGHT) {
-                        alert(Messages.tooSmall);
+                        if (this.mainInstance) alert(Messages.tooSmall);
                         return;
                     }
 
@@ -36,13 +37,13 @@ class FileManager {
         });
     }
 
-    saveImage(saveId) {
-        var save = document.getElementById(saveId);
-
-        save.addEventListener('click', () => {
-            for (var i = 0; i < this.canvasesC.length; i++) {
-                this.canvasesC[i].drawAll(this.image);
-            }
+    drawImageOnCanvas(saveId) {
+        document.getElementById(saveId).addEventListener('click', () => {
+            this.canvasC.drawAll(this.image);
         });
+    }
+
+    drawImageOnCanvasNow() {
+        this.canvasC.drawAll(this.image);
     }
 }

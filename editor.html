@@ -11,7 +11,6 @@
 <div class="editor">
     <input type="file" class="wide" id="load">
     <div class="tools wide">
-
         <button id="cutout" class="button">Upravit výřez</button>
 
         <input type="checkbox" name="tool" id="blur" value="blur">
@@ -21,35 +20,48 @@
         <button id="turnRight" class="button">Otočit vpravo</button>
     </div>
     <div class="svgContainer">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg">
-            <defs id="defs">
-                <filter id="blurFilter" y="-5" height="40">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="3" y="-5"/>
-                </filter>
-            </defs>
-        </svg>
-    </div>
-    <div class="confirm">
-        <button id="cutoutConfirm" class="button">Potvrdit výřez</button>
-        <div style="height: 20px"></div>
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg">
+                <defs id="defs">
+                    <filter id="blurFilter" y="-5" height="40">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="3" y="-5"/>
+                    </filter>
+                </defs>
+            </svg>
+            <div class="confirm">
+                <button id="cutoutConfirm" class="button" style="display: none;">Potvrdit výřez</button>
+                <div style="height: 20px"></div>
+            </div>
+        </div>
+        <div id="minGallery">
+            <div class="cutoutItem">
+                <button id="portBig" class="button">Upravit výřez</button>
+                <div class="galleryItem" id="galleryMin1" style="width: 150px; height: 200px;">
+                    <canvas id="cutoutMin1" class="cutout"></canvas>
+                </div>
+                <span class="mini">150x200px</span>
+            </div>
+            <div class="cutoutItem">
+                <button id="landscape" class="button">Upravit výřez</button>
+                <div class="galleryItem" id="galleryMin2" style="width: 300px; height: 200px;">
+                    <canvas id="cutoutMin2" class="cutout"></canvas>
+                </div>
+                <span class="mini">300x200px</span>
+            </div>
+        </div>
     </div>
 
-    <div class="cutout wide">
-        <button id="titleSmall" class="button wide">50x50</button>
-        <button id="landscape" class="button wide">200x150</button>
-        <button id="portBig" class="button wide">200x300</button>
-        <button id="portSmall" class="button wide">180x260</button>
-    </div>
     <div class="canvasContainer" style="visibility: hidden; position: absolute; z-index: -1000;">
-        <canvas id="0000full" class="full0"></canvas>
+        <canvas id="full00" class="full0"></canvas>
     </div>
+
     <button id="save" class="button wide">Uložit</button>
     <a id="downloadFull" class="button wide">Stáhnout full</a>
 
 
     <div id="gallery">
-        <div class="galleryItem">
-            <canvas id="0000cutout" class="cutout"></canvas>
+        <div class="galleryItem" id="gallery1" style="height: 160px; width: 110px;">
+            <canvas id="cutout00" class="cutout"></canvas>
         </div>
     </div>
 
@@ -66,39 +78,41 @@
 <script>
 
 var SVGInst = new SVGController('svg');
-var canvases = [];
-var galleryCanvases = [];
 
+var mainCanvas = new CanvasController('full00', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
+var galleryCanvas = new CanvasController('cutout00', SVGInst, ImageLimits.MIN_WIDTH, ImageLimits.MIN_HEIGHT );
+var cutout1Canvas = new CanvasController('cutoutMin1', SVGInst, 150, 200);
+var cutout2Canvas = new CanvasController('cutoutMin2', SVGInst, 300, 200);
 
-canvases[0] = new CanvasController('0000full', 'downloadFull', '0000.jpg', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
-galleryCanvases[0] = new CanvasController('0000cutout', 'downloadCutout', '0000c.jpg', SVGInst, ImageLimits.MIN_WIDTH, ImageLimits.MIN_HEIGHT );
+mainCanvas.setCanvasSave('downloadFull', '00.jpg');
 
-
-var cutout = new Cutout(SVGInst, "cutoutConfirm");
 var rotator = new Rotator(SVGInst);
-var blur = new BlurFace('blur', SVGInst);
-var fileManagement = new FileManager(SVGInst, canvases);
-var cutoutFileManagement = new FileManager(SVGInst, galleryCanvases);
-
-
-fileManagement.selectFile('load');
-cutoutFileManagement.selectFile('load');
-
-fileManagement.saveImage('save');
-cutoutFileManagement.saveImage('cutoutConfirm');
-
 rotator.setRotation("turnLeft", false);
 rotator.setRotation("turnRight", true);
 
-cutout.setCutable('cutout', 320, 480, 640);
+var fileManagement = new FileManager(SVGInst, mainCanvas, true);
+var cutoutFileManager = new FileManager(SVGInst, galleryCanvas, false);
+var cutout1FileManager = new FileManager(SVGInst, cutout1Canvas, false);
+var cutout2FileManager = new FileManager(SVGInst, cutout2Canvas, false);
 
-cutout.setCutable('portBig', 200, 300, 200);
-cutout.setCutable('landscape', 200, 150, 200);
+
+fileManagement.selectFile('load');
+cutoutFileManager.selectFile('load');
+cutout1FileManager.selectFile('load');
+cutout2FileManager.selectFile('load');
+
+var cutout = new Cutout(SVGInst, "cutoutConfirm");
+var blur = new BlurFace('blur', SVGInst);
+
+fileManagement.drawImageOnCanvas('save');
+
+cutout.setCutable('cutout', 320, 480, 640, "cutout00", "gallery1", cutoutFileManager);
+
+cutout.setCutable('portBig', 150, 200, 150,  "cutoutMin1", "galleryMin1", cutout1FileManager);
+cutout.setCutable('landscape', 300, 200, 300, "cutoutMin2", "galleryMin2", cutout2FileManager);
 
 blur.setOff('blur', 'cutout');
-blur.setOff('blur', 'titleSmall');
 blur.setOff('blur', 'portBig');
-blur.setOff('blur', 'portSmall');
 blur.setOff('blur', 'landscape');
 
 </script>

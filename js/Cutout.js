@@ -13,32 +13,50 @@ class Cutout {
         this.leftCircle = null;
         this.rightCircle = null;
         this.rect = null;
-
-        this.confirm.addEventListener('click', () => {
-            if (this.svgC.cutoutOn) {
-
-            }
-        })
+        this.lastClicked = null;
 
     }
 
-    setCutable(buttonId, minWidth, height, maxWidth) {
+    setCutable(buttonId, minWidth, height, maxWidth, canvasId, windowId, fileManager) {
         var cutter = document.getElementById(buttonId);
         cutter.addEventListener('click', () => {
             if (this.svgC.imageOriginalHeight === 0) return;
 
             if (this.svgC.cutoutOn && this.svgC.rectGroup != null) {
+                this.confirm.style.display = "none";
                 this.svgC.setCutOff();
             }
 
             if (!this.svgC.cutoutOn || this.id !== buttonId) {
+                this.confirm.style.display = "block";
+                this.lastClicked = cutter;
                 this.makeCutout(minWidth, height);
                 this.svgC.cutoutOn = true;
                 this.minRatio = minWidth / height;
                 this.maxRatio = maxWidth / height;
                 this.id = buttonId;
             }
+        });
+
+        var canvas = document.getElementById(canvasId);
+        var canvasWindow = document.getElementById(windowId);
+        this.confirm.addEventListener('click', () => {
+            if (this.svgC.cutoutOn && this.lastClicked === cutter) {
+                fileManager.drawImageOnCanvasNow();
+                var contentRatio = this.height / this.svgC.svg.clientHeight;
+                var newHeight = canvasWindow.clientHeight / contentRatio;
+                var shrinkRatio = newHeight / this.svgC.svg.clientHeight;
+                var newWidth = shrinkRatio * this.width;
+                canvas.style.height = newHeight + "px";
+                canvasWindow.style.width = newWidth + "px";
+
+                var x = (-1) * this.leftCircle.getAttributeNS(null, "cx") * shrinkRatio;
+                var y = (-1) * this.leftCircle.getAttributeNS(null, "cy") * shrinkRatio;
+                canvas.style.left = x + "px";
+                canvas.style.top = y + "px";
+            }
         })
+
     }
 
     makeCutout(width, height) {
