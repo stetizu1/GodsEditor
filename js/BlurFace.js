@@ -3,6 +3,7 @@ class BlurFace {
         this.svgC = svgControllerInstance;
 
         this.on = false;
+        this.cutouts = [];
 
         this.listenToSwitch(switchId);
         this.addEllipse();
@@ -90,8 +91,16 @@ class BlurFace {
                 return;
             }
             this.svgC.svgEllipses.push(this.ellipse);
+            for (var i = 0; i < this.cutouts.length; i++){
+                this.cutouts[i].doDefaultCutout();
+            }
         });
     }
+
+    registerCutout(cutout){
+        this.cutouts.push(cutout);
+    }
+
     setOff(buttonId, offButtonId) {
         var button = document.getElementById(buttonId);
         var offButton = document.getElementById(offButtonId);

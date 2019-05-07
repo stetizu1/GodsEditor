@@ -4,14 +4,15 @@ class FileManager {
         this.canvasC = canvasControllerInstance;
         this.image = null;
         this.mainInstance = main;
+        this.cutouts = [];
     }
 
     selectFile(inputId) {
-        var input = document.getElementById(inputId);
-        input.addEventListener('change', () => {
-            if (input.files.length === 0) return; //return if none selected
+        this.input = document.getElementById(inputId);
+        this.input.addEventListener('change', () => {
+            if (this.input.files.length === 0) return; //return if none selected
 
-            var file = input.files[0];
+            var file = this.input.files[0];
             var fr = new FileReader();
 
             fr.onload = () => {
@@ -27,7 +28,11 @@ class FileManager {
                     this.svgC.drawImg(this.image);
                     window.addEventListener('resize', () => {
                         this.svgC.redrawImage(this.image);
+                        this.svgC.setCutOff();
                     });
+                    for (var i = 0; i < this.cutouts.length; i++){
+                        this.cutouts[i].doDefaultCutout();
+                    }
                 };
                 this.image.src = fr.result;
 
@@ -45,5 +50,9 @@ class FileManager {
 
     drawImageOnCanvasNow() {
         this.canvasC.drawAll(this.image);
+    }
+
+    registerCutout(cutout){
+        this.cutouts.push(cutout);
     }
 }

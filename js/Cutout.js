@@ -1,25 +1,38 @@
 class Cutout {
-    constructor(svgControllerInstance, confirmButtonId) {
+    constructor(svgControllerInstance, fileManager, height, minWidth, maxWidth, cutButtonId, confirmButtonId, canvasId, windowId, register) {
         this.svgC = svgControllerInstance;
-        this.confirm = document.getElementById(confirmButtonId);
+        this.fileManager = fileManager;
 
         this.x = 0;
         this.y = 0;
-        this.minWidth = 0;
-        this.minHeight = 0;
-        this.minRatio = 1;
-        this.maxRatio = 1;
+        this.limitSVGWidth = 0;
+        this.limitSVGHeight = 0;
 
         this.leftCircle = null;
         this.rightCircle = null;
         this.rect = null;
-        this.lastClicked = null;
+
+        this.canvas = document.getElementById(canvasId);
+        this.canvasWindow = document.getElementById(windowId);
+        this.cutter = document.getElementById(cutButtonId);
+        this.confirm = document.getElementById(confirmButtonId);
+
+        this.canvasHeight = height;
+        this.minCanvasWidth = minWidth;
+        this.maxCanvasWidth = maxWidth;
+
+        this.minRatio = this.minCanvasWidth / this.canvasHeight;
+        this.maxRatio = this.maxCanvasWidth / this.canvasHeight;
+
+        this.fileManager.registerCutout(this);
+        for (var i = 0; i < register.length; i++) register[i].registerCutout(this);
+
+        this.setCutable()
 
     }
 
-    setCutable(buttonId, minWidth, height, maxWidth, canvasId, windowId, fileManager) {
-        var cutter = document.getElementById(buttonId);
-        cutter.addEventListener('click', () => {
+    setCutable() {
+        this.cutter.addEventListener('click', () => {
             if (this.svgC.imageOriginalHeight === 0) return;
 
             if (this.svgC.cutoutOn && this.svgC.rectGroup != null) {
@@ -27,39 +40,37 @@ class Cutout {
                 this.svgC.setCutOff();
             }
 
-            if (!this.svgC.cutoutOn || this.id !== buttonId) {
-                this.confirm.style.display = "block";
-                this.lastClicked = cutter;
-                this.makeCutout(minWidth, height);
+            if (!this.svgC.cutoutOn) {
                 this.svgC.cutoutOn = true;
-                this.minRatio = minWidth / height;
-                this.maxRatio = maxWidth / height;
-                this.id = buttonId;
+                this.confirm.style.display = "block";
+                this.makeCutout();
             }
         });
 
-        var canvas = document.getElementById(canvasId);
-        var canvasWindow = document.getElementById(windowId);
         this.confirm.addEventListener('click', () => {
-            if (this.svgC.cutoutOn && this.lastClicked === cutter) {
-                fileManager.drawImageOnCanvasNow();
-                var contentRatio = this.height / this.svgC.svg.clientHeight;
-                var newHeight = canvasWindow.clientHeight / contentRatio;
-                var shrinkRatio = newHeight / this.svgC.svg.clientHeight;
-                var newWidth = shrinkRatio * this.width;
-                canvas.style.height = newHeight + "px";
-                canvasWindow.style.width = newWidth + "px";
-
-                var x = (-1) * this.leftCircle.getAttributeNS(null, "cx") * shrinkRatio;
-                var y = (-1) * this.leftCircle.getAttributeNS(null, "cy") * shrinkRatio;
-                canvas.style.left = x + "px";
-                canvas.style.top = y + "px";
+            if (this.svgC.cutoutOn) {
+                this.drawCutout();
             }
-        })
+        });
 
     }
 
-    makeCutout(width, height) {
+    drawCutout() {
+        this.fileManager.drawImageOnCanvasNow();
+        var contentRatio = this.height / this.svgC.svg.clientHeight;
+        var newHeight = this.canvasWindow.clientHeight / contentRatio;
+        var shrinkRatio = newHeight / this.svgC.svg.clientHeight;
+        var newWidth = shrinkRatio * this.width;
+        this.canvas.style.height = newHeight + "px";
+        this.canvasWindow.style.width = newWidth + "px";
+
+        var x = (-1) * this.leftCircle.getAttributeNS(null, "cx") * shrinkRatio;
+        var y = (-1) * this.leftCircle.getAttributeNS(null, "cy") * shrinkRatio;
+        this.canvas.style.left = x + "px";
+        this.canvas.style.top = y + "px";
+    }
+
+    makeCutout() {
         this.svgC.rectGroup = document.createElementNS(this.svgC.svgNS, 'g');
         this.rect = document.createElementNS(this.svgC.svgNS, 'rect');
         this.rect.setAttributeNS(null, 'fill', 'rgba(192,192,192,0.3)');
@@ -73,13 +84,13 @@ class Cutout {
 
         var minRatio = svgW / this.svgC.imageOriginalWidth;
 
-        this.minWidth = width * minRatio;
-        this.minHeight = height * minRatio;
+        this.limitSVGWidth = this.minCanvasWidth * minRatio;
+        this.limitSVGHeight = this.canvasHeight * minRatio;
 
-        var maxRatio = Math.min(svgW / width, svgH / height);
+        var maxRatio = Math.min(svgW / this.maxCanvasWidth, svgH / this.canvasHeight);
 
-        this.height = height * maxRatio;
-        this.width = width * maxRatio;
+        this.height = this.canvasHeight * maxRatio;
+        this.width = this.maxCanvasWidth * maxRatio;
 
         this.x = (svgW - this.width) / 2;
         this.y = (svgH - this.height) / 2;
@@ -120,7 +131,6 @@ class Cutout {
         this.svgC.rectGroup.appendChild(circlesGroup);
     }
 
-
     setDraggable() {
         this.setDraggableC(this.leftCircle, this.rightCircle, false);
         this.setDraggableC(this.rightCircle, this.leftCircle, true);
@@ -144,11 +154,11 @@ class Cutout {
             limitY = parseInt(limitCircle.getAttributeNS(null, "cy"));
 
             if (right) {
-                limitX += this.minWidth;
-                limitY += this.minHeight;
+                limitX += this.limitSVGWidth;
+                limitY += this.limitSVGHeight;
             } else {
-                limitX -= this.minWidth;
-                limitY -= this.minHeight;
+                limitX -= this.limitSVGWidth;
+                limitY -= this.limitSVGHeight;
             }
 
             start = true;
@@ -256,6 +266,18 @@ class Cutout {
         });
         this.svgC.svg.addEventListener('mouseleave', () => {
             start = false
+        });
+    }
+
+    doDefaultCutout() {
+        this.makeCutout();
+        this.drawCutout();
+        this.svgC.setCutOff();
+    }
+
+    static hideButton(buttonId, offButtonId) {
+        document.getElementById(offButtonId).addEventListener('click', () => {
+            document.getElementById(buttonId).style.display = "none";
         });
     }
 }

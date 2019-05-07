@@ -2,6 +2,7 @@ class Rotator {
     constructor(svgControllerInstance) {
         this.svgC = svgControllerInstance;
         this.right = false;
+        this.cutouts = [];
     }
 
     setRotation(buttonId, right) {
@@ -15,6 +16,9 @@ class Rotator {
             this.svgC.rotation += degrees;
             if (this.svgC.rotation >= 360) this.svgC.rotation -= 360;
             this.rotate();
+            for (var i = 0; i < this.cutouts.length; i++){
+                this.cutouts[i].doDefaultCutout();
+            }
         });
     }
 
@@ -37,7 +41,6 @@ class Rotator {
 
         this.svgC.svg.style.height = newH + 'px';
         this.svgC.svgImg.setAttribute('transform', 'rotate(' + rotation + ')');
-
     }
 
     rotateEllipses(oldW, oldH, newW, newH) {
@@ -67,5 +70,9 @@ class Rotator {
                 ellipse.setAttributeNS(null, 'cy', newH - newH * xRatio);
             }
         }
+    }
+
+    registerCutout(cutout){
+        this.cutouts.push(cutout);
     }
 }
