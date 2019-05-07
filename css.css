@@ -31,6 +31,11 @@ body {
     padding: 0;
 }
 
+.svgInner {
+    max-width: 55%;
+    margin-left: 5px;
+}
+
 .svgContainer #minGallery {
     display: flex;
     align-items: flex-start;
@@ -78,6 +83,10 @@ input[type="checkbox"]:checked + label {
         flex-direction: row;
         width: 100%;
         height: auto;
+    }
+
+    .svgInner {
+         width: auto;
     }
 }
 @media screen and (max-width: 550px) {

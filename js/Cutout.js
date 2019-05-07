@@ -1,4 +1,7 @@
+var cutout_last_clicked_button = null;
+
 class Cutout {
+
     constructor(svgControllerInstance, fileManager, height, minWidth, maxWidth, cutButtonId, confirmButtonId, canvasId, windowId, register) {
         this.svgC = svgControllerInstance;
         this.fileManager = fileManager;
@@ -27,9 +30,14 @@ class Cutout {
         this.fileManager.registerCutout(this);
         for (var i = 0; i < register.length; i++) register[i].registerCutout(this);
 
-        this.setCutable()
+        this.setCutable();
 
+        this.sendX = 0;
+        this.sendY = 0;
+        this.contentWidthRatio = 100;
+        this.contentHeightRatio = 100;
     }
+
 
     setCutable() {
         this.cutter.addEventListener('click', () => {
@@ -41,14 +49,15 @@ class Cutout {
             }
 
             if (!this.svgC.cutoutOn) {
-                this.svgC.cutoutOn = true;
                 this.confirm.style.display = "block";
+                this.svgC.cutoutOn = true;
                 this.makeCutout();
+                cutout_last_clicked_button = this.cutter
             }
         });
 
         this.confirm.addEventListener('click', () => {
-            if (this.svgC.cutoutOn) {
+            if (this.svgC.cutoutOn && cutout_last_clicked_button === this.cutter) {
                 this.drawCutout();
             }
         });
@@ -57,10 +66,19 @@ class Cutout {
 
     drawCutout() {
         this.fileManager.drawImageOnCanvasNow();
-        var contentRatio = this.height / this.svgC.svg.clientHeight;
-        var newHeight = this.canvasWindow.clientHeight / contentRatio;
-        var shrinkRatio = newHeight / this.svgC.svg.clientHeight;
+
+        //mozilla - needed instead of svg.clientHeight
+        var box = this.svgC.svg.getBoundingClientRect();
+        var svgClientHeight = box.bottom - box.top;
+        var svgClientWidth = box.right - box.left;
+
+        this.contentHeightRatio = this.height / svgClientHeight;
+        this.contentWidthRatio = this.width / svgClientWidth;
+
+        var newHeight = this.canvasWindow.clientHeight / this.contentHeightRatio;
+        var shrinkRatio = newHeight / svgClientHeight;
         var newWidth = shrinkRatio * this.width;
+
         this.canvas.style.height = newHeight + "px";
         this.canvasWindow.style.width = newWidth + "px";
 
@@ -68,6 +86,16 @@ class Cutout {
         var y = (-1) * this.leftCircle.getAttributeNS(null, "cy") * shrinkRatio;
         this.canvas.style.left = x + "px";
         this.canvas.style.top = y + "px";
+
+        if(this.svgC.rotation % 180 === 0){
+            var origHeight = this.svgC.imageOriginalHeight;
+            var resizeRatio = origHeight / svgClientHeight;
+            console.log(resizeRatio);
+            this.sendX = this.leftCircle.getAttributeNS(null, "cx") * resizeRatio;
+            this.sendY = this.leftCircle.getAttributeNS(null, "cy") * resizeRatio;
+            console.log("sendX: " + this.sendX + " sendY: "+ this.sendY);
+            console.log(this.contentHeightRatio +"x" + this.contentWidthRatio)
+        }
     }
 
     makeCutout() {
