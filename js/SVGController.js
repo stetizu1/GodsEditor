@@ -23,17 +23,24 @@ class SVGController {
 
     listenToMousePosition() {
         var mousePos = (event) => {
-
-            var rect = this.svg.getBoundingClientRect();
-            var position = {top: (rect.top), left: rect.left};
-
-            if (event.clientX) {
-                this.mouseX = event.clientX - position.left; //only clientX / -Y has same behavior on Firefox and Chrome
-                this.mouseY = event.clientY - position.top;
-            }
+            this.listenEvent(event);
         };
         window.addEventListener('mousemove', mousePos);
+        window.addEventListener('touchmove', mousePos);
         window.addEventListener('scroll', mousePos);
+    }
+
+    listenEvent(event) {
+        var rect = this.svg.getBoundingClientRect();
+        var position = {top: (rect.top), left: rect.left};
+
+        if (event.clientX) {
+            this.mouseX = event.clientX - position.left; //only clientX / -Y has same behavior on Firefox and Chrome
+            this.mouseY = event.clientY - position.top;
+        } else if(event.touches && event.touches[0].clientX) {
+            this.mouseX = event.touches[0].clientX - position.left;
+            this.mouseY = event.touches[0].clientY - position.top;
+        }
     }
 
     initImage() {

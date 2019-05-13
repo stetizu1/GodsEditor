@@ -83,10 +83,11 @@ input[type="checkbox"]:checked + label {
         flex-direction: row;
         width: 100%;
         height: auto;
+        margin-left: 0;
     }
 
     .svgInner {
-         width: auto;
+         max-width: initial;
     }
 }
 @media screen and (max-width: 550px) {

@@ -90,11 +90,8 @@ class Cutout {
         if(this.svgC.rotation % 180 === 0){
             var origHeight = this.svgC.imageOriginalHeight;
             var resizeRatio = origHeight / svgClientHeight;
-            console.log(resizeRatio);
             this.sendX = this.leftCircle.getAttributeNS(null, "cx") * resizeRatio;
             this.sendY = this.leftCircle.getAttributeNS(null, "cy") * resizeRatio;
-            console.log("sendX: " + this.sendX + " sendY: "+ this.sendY);
-            console.log(this.contentHeightRatio +"x" + this.contentWidthRatio)
         }
     }
 
