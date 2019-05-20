@@ -26,9 +26,15 @@ class FileManager {
                     this.svgC.rotation = 0;
                     this.svgC.clear(); //clear old image
                     this.svgC.drawImg(this.image);
+
+                    var screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+                    this.svgC.circleSize = screenWidth >= 980 ? '10' : '20';
+
                     window.addEventListener('resize', () => {
                         this.svgC.redrawImage(this.image);
                         this.svgC.setCutOff();
+                        var screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+                        this.svgC.circleSize = screenWidth >= 980 ? '10' : '20';
                     });
                     for (var i = 0; i < this.cutouts.length; i++){
                         this.cutouts[i].doDefaultCutout();

@@ -134,7 +134,7 @@ class Cutout {
         circlesGroup.setAttribute('class', 'circles');
 
         this.leftCircle = document.createElementNS(this.svgC.svgNS, 'circle');
-        this.leftCircle.setAttributeNS(null, 'r', '10');
+        this.leftCircle.setAttributeNS(null, 'r', this.svgC.circleSize);
         this.leftCircle.setAttributeNS(null, 'cx', x1);
         this.leftCircle.setAttributeNS(null, 'cy', y1);
         this.leftCircle.setAttribute('fill', 'grey');
@@ -142,7 +142,7 @@ class Cutout {
 
 
         this.rightCircle = document.createElementNS(this.svgC.svgNS, 'circle');
-        this.rightCircle.setAttributeNS(null, 'r', '10');
+        this.rightCircle.setAttributeNS(null, 'r', this.svgC.circleSize);
         this.rightCircle.setAttributeNS(null, 'cx', x2);
         this.rightCircle.setAttributeNS(null, 'cy', y2);
         this.rightCircle.setAttribute('fill', 'grey');

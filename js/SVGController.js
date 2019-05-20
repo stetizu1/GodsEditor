@@ -17,6 +17,7 @@ class SVGController {
         this.y = '0';
         this.imageOriginalHeight = 0;
         this.imageOriginalWidth = 0;
+        this.circleSize = '10';
 
         this.cutoutOn = false;
     }
