@@ -1,10 +1,25 @@
 class FileManager {
-    constructor(svgControllerInstance, canvasControllerInstance, main) {
+    constructor(svgControllerInstance, canvasControllerInstance, galleryId, cutoutStartId, cutoutConfirmId) {
         this.svgC = svgControllerInstance;
         this.canvasC = canvasControllerInstance;
+
+        this.canvasCCutouts = [];
+        this.mainCutouts = [];
+
+        this.active = -1;
+        this.main = 0;
         this.image = null;
-        this.mainInstance = main;
-        this.cutouts = [];
+
+        this.gallery = document.getElementById(galleryId);
+        this.galleryCanvases = [];
+        this.galleryCutouts = [];
+
+        this.empty = true;
+        this.i = 0;
+
+        this.cutoutStartId = cutoutStartId;
+        this.cutoutConfirmId = cutoutConfirmId;
+
     }
 
     selectFile(inputId) {
@@ -19,7 +34,7 @@ class FileManager {
                 this.image = new Image();
                 this.image.onload = () => { //set attributes for svg image
                     if (this.image.width < ImageLimits.MIN_WIDTH || this.image.height < ImageLimits.MIN_HEIGHT) {
-                        if (this.mainInstance) alert(Messages.tooSmall);
+                        alert(Messages.tooSmall);
                         return;
                     }
 
@@ -36,9 +51,17 @@ class FileManager {
                         var screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
                         this.svgC.circleSize = screenWidth >= 980 ? '10' : '20';
                     });
-                    for (var i = 0; i < this.cutouts.length; i++){
-                        this.cutouts[i].doDefaultCutout();
+                    if (this.empty) {
+                        for (var i = 0; i < this.mainCutouts.length; i++) {
+                            this.mainCutouts[i].doDefaultCutout();
+                        }
+                        this.empty = false;
                     }
+
+                    this.addGalleryItem(this.i);
+                    this.registerGalleryItem(this.i);
+                    this.i++;
+                    this.active++;
                 };
                 this.image.src = fr.result;
 
@@ -48,17 +71,93 @@ class FileManager {
         });
     }
 
+    resetCutouts(){
+        if(this.active === this.main) {
+            for (var i = 0; i < this.mainCutouts.length; i++) {
+                this.mainCutouts[i].doDefaultCutout();
+            }
+        }
+        this.galleryCutouts[this.active].doDefaultCutout();
+    }
+
+    addCutoutItem(id, btnId, width, height) {
+        var ci = document.createElement("div");
+        ci.classList.add("cutoutItem");
+
+        var bt = document.createElement("button");
+        bt.id = btnId;
+        bt.classList.add("button");
+        bt.innerText = "Upravit výřez";
+
+        var gi = document.createElement("div");
+        gi.classList.add("galleryItem");
+        gi.id = "galleryMin" + id;
+        gi.style.width = width + "px";
+        gi.style.height = height + "px";
+
+        var can = document.createElement("canvas");
+        can.id = "cutoutMin" + id;
+        can.classList.add("cutout");
+        gi.appendChild(can);
+
+        var sp = document.createElement("span");
+        sp.classList.add("mini");
+        sp.innerText = width + "×" + height + " px";
+
+        ci.appendChild(bt);
+        ci.appendChild(gi);
+        ci.appendChild(sp);
+        this.cutGallery.appendChild(ci);
+
+    }
+
+    addGalleryItem(id) {
+        var gi = document.createElement("div");
+        gi.classList.add("galleryItem");
+        gi.id = "gallery" + id;
+        gi.style.height = "160px";
+        gi.style.width = "110px";
+
+        var can = document.createElement("canvas");
+        can.id = "cutout" + id;
+        can.classList.add("cutout");
+
+        gi.appendChild(can);
+        this.gallery.appendChild(gi);
+    }
+
+    registerGalleryItem(id) {
+        var cc = new CanvasController('cutout' + id, this.svgC, ImageLimits.MIN_WIDTH, ImageLimits.MIN_HEIGHT);
+        this.galleryCanvases.push(cc);
+        var cutout = new Cutout(this.svgC, this, cc, 480, 320, 640, this.cutoutStartId, this.cutoutConfirmId, "gallery" + id, id);
+        this.galleryCutouts.push(cutout);
+        cutout.doDefaultCutout();
+
+    }
+
     drawImageOnCanvas(saveId) {
         document.getElementById(saveId).addEventListener('click', () => {
             this.canvasC.drawAll(this.image);
         });
     }
 
-    drawImageOnCanvasNow() {
-        this.canvasC.drawAll(this.image);
+    drawImageOnCanvasNow(canvasC) {
+        canvasC.drawAll(this.image);
+
     }
 
-    registerCutout(cutout){
-        this.cutouts.push(cutout);
+    registerMainCutouts(cutId, cutouts) {
+
+        this.cutGallery = document.getElementById(cutId);
+        for (let i = 0; i < cutouts.length; i++) {
+            var width = cutouts[i]["width"];
+            var height = cutouts[i]["height"];
+            var id = cutouts[i]["id"];
+
+            this.addCutoutItem( i + 1, id, width, height);
+            this.canvasCCutouts.push(new CanvasController('cutoutMin' + (i + 1), this.svgC, width, height));
+            var cutout = new Cutout(this.svgC, this, this.canvasCCutouts[i], height, width, width, id, this.cutoutConfirmId, "galleryMin" + (i + 1), i);
+            this.mainCutouts.push(cutout);
+        }
     }
 }

@@ -1,8 +1,10 @@
 class Rotator {
-    constructor(svgControllerInstance) {
+    constructor(svgControllerInstance, fileManager, leftId, rightId) {
         this.svgC = svgControllerInstance;
         this.right = false;
-        this.cutouts = [];
+        this.fileManager = fileManager;
+        this.setRotation(leftId, false);
+        this.setRotation(rightId, true);
     }
 
     setRotation(buttonId, right) {
@@ -16,9 +18,7 @@ class Rotator {
             this.svgC.rotation += degrees;
             if (this.svgC.rotation >= 360) this.svgC.rotation -= 360;
             this.rotate();
-            for (var i = 0; i < this.cutouts.length; i++){
-                this.cutouts[i].doDefaultCutout();
-            }
+            this.fileManager.resetCutouts();
         });
     }
 
@@ -70,9 +70,5 @@ class Rotator {
                 ellipse.setAttributeNS(null, 'cy', newH - newH * xRatio);
             }
         }
-    }
-
-    registerCutout(cutout){
-        this.cutouts.push(cutout);
     }
 }

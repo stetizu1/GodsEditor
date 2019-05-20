@@ -1,9 +1,9 @@
 class BlurFace {
-    constructor(switchId, svgControllerInstance) {
+    constructor(svgControllerInstance, fileManager, switchId) {
         this.svgC = svgControllerInstance;
 
         this.on = false;
-        this.cutouts = [];
+        this.fileManager = fileManager;
 
         this.listenToSwitch(switchId);
         this.addEllipse();
@@ -138,14 +138,8 @@ class BlurFace {
         this.updateCutout();
     }
 
-    registerCutout(cutout) {
-        this.cutouts.push(cutout);
-    }
-
     updateCutout(){
-        for (var i = 0; i < this.cutouts.length; i++) {
-            this.cutouts[i].doDefaultCutout();
-        }
+        this.fileManager.resetCutouts();
     }
 
     setOff(buttonId, offButtonId) {

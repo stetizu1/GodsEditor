@@ -2,8 +2,9 @@ var cutout_last_clicked_button = null;
 
 class Cutout {
 
-    constructor(svgControllerInstance, fileManager, height, minWidth, maxWidth, cutButtonId, confirmButtonId, canvasId, windowId, register) {
+    constructor(svgControllerInstance, fileManager, canvasControllerInstance, height, minWidth, maxWidth, cutButtonId, confirmButtonId, windowId, fmId) {
         this.svgC = svgControllerInstance;
+        this.canvasC = canvasControllerInstance;
         this.fileManager = fileManager;
 
         this.x = 0;
@@ -15,7 +16,6 @@ class Cutout {
         this.rightCircle = null;
         this.rect = null;
 
-        this.canvas = document.getElementById(canvasId);
         this.canvasWindow = document.getElementById(windowId);
         this.cutter = document.getElementById(cutButtonId);
         this.confirm = document.getElementById(confirmButtonId);
@@ -27,15 +27,14 @@ class Cutout {
         this.minRatio = this.minCanvasWidth / this.canvasHeight;
         this.maxRatio = this.maxCanvasWidth / this.canvasHeight;
 
-        this.fileManager.registerCutout(this);
-        for (var i = 0; i < register.length; i++) register[i].registerCutout(this);
-
         this.setCutable();
 
         this.sendX = 0;
         this.sendY = 0;
         this.contentWidthRatio = 100;
         this.contentHeightRatio = 100;
+
+        this.fmId = fmId;
     }
 
 
@@ -58,6 +57,7 @@ class Cutout {
 
         this.confirm.addEventListener('click', () => {
             if (this.svgC.cutoutOn && cutout_last_clicked_button === this.cutter) {
+                if(this.fileManager.active === this.fmId)
                 this.drawCutout();
             }
         });
@@ -65,7 +65,7 @@ class Cutout {
     }
 
     drawCutout() {
-        this.fileManager.drawImageOnCanvasNow();
+        this.fileManager.drawImageOnCanvasNow(this.canvasC);
 
         //mozilla - needed instead of svg.clientHeight
         var box = this.svgC.svg.getBoundingClientRect();
@@ -79,13 +79,13 @@ class Cutout {
         var shrinkRatio = newHeight / svgClientHeight;
         var newWidth = shrinkRatio * this.width;
 
-        this.canvas.style.height = newHeight + "px";
+        this.canvasC.canvas.style.height = newHeight + "px";
         this.canvasWindow.style.width = newWidth + "px";
 
         var x = (-1) * this.leftCircle.getAttributeNS(null, "cx") * shrinkRatio;
         var y = (-1) * this.leftCircle.getAttributeNS(null, "cy") * shrinkRatio;
-        this.canvas.style.left = x + "px";
-        this.canvas.style.top = y + "px";
+        this.canvasC.canvas.style.left = x + "px";
+        this.canvasC.canvas.style.top = y + "px";
 
         if (this.svgC.rotation % 180 === 0) {
             var origHeight = this.svgC.imageOriginalHeight;
@@ -351,11 +351,5 @@ class Cutout {
         this.makeCutout();
         this.drawCutout();
         this.svgC.setCutOff();
-    }
-
-    static hideButton(buttonId, offButtonId) {
-        document.getElementById(offButtonId).addEventListener('click', () => {
-            document.getElementById(buttonId).style.display = "none";
-        });
     }
 }
