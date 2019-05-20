@@ -87,7 +87,7 @@ class Cutout {
         this.canvas.style.left = x + "px";
         this.canvas.style.top = y + "px";
 
-        if(this.svgC.rotation % 180 === 0){
+        if (this.svgC.rotation % 180 === 0) {
             var origHeight = this.svgC.imageOriginalHeight;
             var resizeRatio = origHeight / svgClientHeight;
             this.sendX = this.leftCircle.getAttributeNS(null, "cx") * resizeRatio;
@@ -169,7 +169,7 @@ class Cutout {
         var limitX = 0,
             limitY = 0;
 
-        circle.addEventListener('mousedown', (event) => {
+        var mouseDwn = (event) => {
             if (event.preventDefault) event.preventDefault();
 
             x = circle.getAttributeNS(null, "cx");
@@ -187,9 +187,9 @@ class Cutout {
             }
 
             start = true;
+        };
 
-        });
-        window.addEventListener('mousemove', () => {
+        var mouseMv = () => {
             if (start) {
                 var newX = this.svgC.mouseX;
                 var newY = this.svgC.mouseY;
@@ -234,8 +234,16 @@ class Cutout {
 
                 circle.setAttributeNS(null, 'cx', newX);
                 circle.setAttributeNS(null, 'cy', newY);
-
             }
+        };
+
+        //mouse
+        circle.addEventListener('mousedown', (event) => {
+            mouseDwn(event);
+        });
+
+        window.addEventListener('mousemove', () => {
+            mouseMv();
         });
         this.svgC.svg.addEventListener('mouseup', () => {
             start = false
@@ -243,7 +251,26 @@ class Cutout {
         this.svgC.svg.addEventListener('mouseleave', () => {
             start = false
         });
-    }
+
+        //touch
+        circle.addEventListener('touchstart', (event) => {
+            mouseDwn(event);
+        });
+        window.addEventListener('touchmove', () => {
+            mouseMv();
+        });
+        this.svgC.svg.addEventListener('touchend', () => {
+            start = false;
+        });
+        var bounds = this.svgC.svg.getBoundingClientRect();
+        document.addEventListener('touchmove', (event) => { //touch leave
+            var touch = event.touches[0];
+            if (touch.pageX > bounds.x + bounds.width || touch.pageX < bounds.x
+                || touch.pageY > bounds.y + bounds.height || touch.pageY < bounds.y) {
+                start = false;
+            }
+        }, false);
+    };
 
     setDraggableR() {
         var start = false;
@@ -252,8 +279,9 @@ class Cutout {
         var startRectX = 0,
             startRectY = 0;
 
-        this.rect.addEventListener('mousedown', (event) => {
+        var mouseDwn = (event) => {
             if (event.preventDefault) event.preventDefault();
+            this.svgC.listenEvent(event);
             startX = this.svgC.mouseX;
             startY = this.svgC.mouseY;
 
@@ -261,9 +289,9 @@ class Cutout {
             startRectY = this.y;
 
             start = true;
+        };
 
-        });
-        window.addEventListener('mousemove', () => {
+        var mouseMv = () => {
             if (start) {
                 var endX = this.svgC.mouseX;
                 var endY = this.svgC.mouseY;
@@ -285,6 +313,13 @@ class Cutout {
                 this.x = newX;
                 this.y = newY;
             }
+        };
+
+        this.rect.addEventListener('mousedown', (event) => {
+            mouseDwn(event);
+        });
+        window.addEventListener('mousemove', () => {
+            mouseMv();
         });
         this.svgC.svg.addEventListener('mouseup', () => {
             start = false
@@ -292,6 +327,24 @@ class Cutout {
         this.svgC.svg.addEventListener('mouseleave', () => {
             start = false
         });
+
+        this.rect.addEventListener('touchstart', (event) => {
+            mouseDwn(event);
+        });
+        window.addEventListener('touchmove', () => {
+            mouseMv();
+        });
+        this.svgC.svg.addEventListener('touchend', () => {
+            start = false;
+        });
+        var bounds = this.svgC.svg.getBoundingClientRect();
+        document.addEventListener('touchmove', (event) => { //touch leave
+            var touch = event.touches[0];
+            if (touch.pageX > bounds.x + bounds.width || touch.pageX < bounds.x
+                || touch.pageY > bounds.y + bounds.height || touch.pageY < bounds.y) {
+                start = false;
+            }
+        }, false);
     }
 
     doDefaultCutout() {
