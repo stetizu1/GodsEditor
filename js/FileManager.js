@@ -1,5 +1,5 @@
 class FileManager {
-    constructor(svgControllerInstance, canvasControllerInstance, galleryId, cutoutStartId, cutoutConfirmId) {
+    constructor(svgControllerInstance, canvasControllerInstance, galleryId, cutoutStartId, cutoutConfirmId, titleId) {
         this.svgC = svgControllerInstance;
         this.canvasC = canvasControllerInstance;
 
@@ -16,9 +16,21 @@ class FileManager {
 
         this.empty = true;
         this.i = 0;
+        this.count = 0;
 
         this.cutoutStartId = cutoutStartId;
         this.cutoutConfirmId = cutoutConfirmId;
+        this.useAsATitle(titleId);
+
+    }
+
+    useAsATitle(titleId) {
+        var useButton = document.getElementById(titleId);
+        useButton.addEventListener('click', () => {
+            this.main = this.active;
+
+            this.resetCutouts();
+        });
 
     }
 
@@ -71,10 +83,11 @@ class FileManager {
         });
     }
 
-    resetCutouts(){
-        if(this.active === this.main) {
+    resetCutouts() {
+        if (this.active === this.main) {
             for (var i = 0; i < this.mainCutouts.length; i++) {
                 this.mainCutouts[i].doDefaultCutout();
+                this.mainCutouts[i].fmId = this.main;
             }
         }
         this.galleryCutouts[this.active].doDefaultCutout();
@@ -112,6 +125,9 @@ class FileManager {
     }
 
     addGalleryItem(id) {
+        var itemDiv = document.createElement("div");
+        itemDiv.classList.add("gallery-container");
+
         var gi = document.createElement("div");
         gi.classList.add("galleryItem");
         gi.id = "gallery" + id;
@@ -123,7 +139,51 @@ class FileManager {
         can.classList.add("cutout");
 
         gi.appendChild(can);
-        this.gallery.appendChild(gi);
+
+        this.addButtons(itemDiv, gi);
+        this.gallery.appendChild(itemDiv);
+    }
+
+    addButtons(div, gi) {
+        div.style.order = this.count;
+        this.count++;
+        var leftButton = document.createElement("button");
+        leftButton.innerHTML = "&laquo;";
+        var rightButton = document.createElement("button");
+        rightButton.innerHTML = "&raquo;";
+
+        leftButton.addEventListener("click", () => {
+            var oldOrder = parseInt(div.style.order);
+            if (oldOrder > 0) {
+                var children = this.gallery.childNodes;
+                for (var i = 0; i < children.length; i++) {
+                    if (children[i].style.order === (oldOrder - 1).toString()) {
+                        children[i].style.order = oldOrder;
+                        break;
+                    }
+                }
+                div.style.order = oldOrder - 1;
+            }
+        });
+
+        rightButton.addEventListener("click", () => {
+            var oldOrder = parseInt(div.style.order);
+            var children = this.gallery.childNodes;
+            if (oldOrder < children.length - 1) {
+                for (var i = 0; i < children.length; i++) {
+                    if (children[i].style.order === (oldOrder + 1).toString()) {
+                        children[i].style.order = oldOrder;
+                        break;
+                    }
+                }
+                div.style.order = oldOrder + 1;
+            }
+        });
+
+        div.appendChild(leftButton);
+        div.appendChild(gi);
+        div.appendChild(rightButton);
+
     }
 
     registerGalleryItem(id) {
@@ -147,16 +207,15 @@ class FileManager {
     }
 
     registerMainCutouts(cutId, cutouts) {
-
         this.cutGallery = document.getElementById(cutId);
         for (let i = 0; i < cutouts.length; i++) {
             var width = cutouts[i]["width"];
             var height = cutouts[i]["height"];
             var id = cutouts[i]["id"];
 
-            this.addCutoutItem( i + 1, id, width, height);
+            this.addCutoutItem(i + 1, id, width, height);
             this.canvasCCutouts.push(new CanvasController('cutoutMin' + (i + 1), this.svgC, width, height));
-            var cutout = new Cutout(this.svgC, this, this.canvasCCutouts[i], height, width, width, id, this.cutoutConfirmId, "galleryMin" + (i + 1), i);
+            var cutout = new Cutout(this.svgC, this, this.canvasCCutouts[i], height, width, width, id, this.cutoutConfirmId, "galleryMin" + (i + 1), 0);
             this.mainCutouts.push(cutout);
         }
     }

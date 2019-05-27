@@ -113,4 +113,13 @@ canvas, svg {
 #gallery {
     width: 100%;
     margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.gallery-container {
+    display: flex;
+    padding: 0 5px;
+}
+.gallery-container button {
+    padding: 5px 8px;
 }

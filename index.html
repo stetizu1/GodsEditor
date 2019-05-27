@@ -18,6 +18,8 @@
 
         <button id="turnLeft" class="button">Otočit vlevo</button>
         <button id="turnRight" class="button">Otočit vpravo</button>
+
+        <button id="useAsATitle" class="button">Použít na titulní stránku</button>
     </div>
     <div class="svgContainer">
         <div class="svgInner">
@@ -65,7 +67,7 @@ var mainCanvas = new CanvasController('full00', SVGInst, ImageLimits.MAX_WIDTH, 
 
 mainCanvas.setCanvasSave('downloadFull', '00.jpg');
 
-var fileManager = new FileManager(SVGInst, mainCanvas, 'gallery', 'cutout', 'cutoutConfirm');
+var fileManager = new FileManager(SVGInst, mainCanvas, 'gallery', 'cutout', 'cutoutConfirm', 'useAsATitle');
 var rotator = new Rotator(SVGInst, fileManager, "turnLeft", "turnRight");
 var blur = new BlurFace(SVGInst, fileManager, "blur");
 
