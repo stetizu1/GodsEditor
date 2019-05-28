@@ -53,11 +53,15 @@ body {
     display: flex;
 }
 
-.button {
+.button, #downloadContainer a {
     background: #69c;
     color: #fff;
     padding: 5px 10px;
     border: 1px solid #7bb5ef;
+}
+
+.button.confirm{
+    background: #47cb2e;
 }
 
 input[type="checkbox"] {
@@ -105,7 +109,7 @@ canvas, svg {
     overflow: hidden;
 }
 
-.cutout {
+.cutout, .cutoutMin {
     position: absolute;
 }
 

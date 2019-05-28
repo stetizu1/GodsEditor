@@ -21,6 +21,9 @@
 
         <button id="useAsATitle" class="button">Použít na titulní stránku</button>
     </div>
+    <div class="tools">
+        <button id="cutoutConfirm" class="button confirm">Potvrdit výřez</button>
+    </div>
     <div class="svgContainer">
         <div class="svgInner">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg">
@@ -30,21 +33,15 @@
                     </filter>
                 </defs>
             </svg>
-            <div class="confirm">
-                <button id="cutoutConfirm" class="button" style="display: none;">Potvrdit výřez</button>
-                <div style="height: 20px"></div>
-            </div>
         </div>
         <div id="minGallery">
         </div>
     </div>
 
-    <div class="canvasContainer" style="visibility: hidden; position: absolute; z-index: -1000;">
-        <canvas id="full00" class="full0"></canvas>
-    </div>
+    <div class="canvasContainer" id="canvasContainer" style="visibility: hidden; position: absolute; z-index: -1000;"></div>
 
-    <button id="save" class="button wide">Uložit</button>
-    <a id="downloadFull" class="button wide">Stáhnout full</a>
+    <!-- <a id="downloadFull" class="button wide">Stáhnout full</a> -->
+    <div class="tools wide" id="downloadContainer"></div>
 
 
     <div id="gallery"></div>
@@ -53,6 +50,7 @@
 <script src="js/settings/ImageLimits.js"></script>
 <script src="js/settings/Messages.js"></script>
 
+<script src="js/ItemSave.js"></script>
 <script src="js/FileManager.js"></script>
 <script src="js/SVGController.js"></script>
 <script src="js/CanvasController.js"></script>
@@ -61,25 +59,16 @@
 <script src="js/Cutout.js"></script>
 <script>
 
-var SVGInst = new SVGController('svg');
+const SVGInst = new SVGController('svg');
+const fileManager = new FileManager(SVGInst, 'load', 'gallery', 'cutout', 'cutoutConfirm', 'useAsATitle', 'canvasContainer', 'downloadContainer');
+const rotator = new Rotator(SVGInst, fileManager, "turnLeft", "turnRight");
+const blur = new BlurFace(SVGInst, fileManager, "blur");
 
-var mainCanvas = new CanvasController('full00', SVGInst, ImageLimits.MAX_WIDTH, ImageLimits.MAX_HEIGHT);
-
-mainCanvas.setCanvasSave('downloadFull', '00.jpg');
-
-var fileManager = new FileManager(SVGInst, mainCanvas, 'gallery', 'cutout', 'cutoutConfirm', 'useAsATitle');
-var rotator = new Rotator(SVGInst, fileManager, "turnLeft", "turnRight");
-var blur = new BlurFace(SVGInst, fileManager, "blur");
-
-
-fileManager.selectFile('load');
 fileManager.registerMainCutouts("minGallery", [{"id": "portBig", "width": 150, "height": 200}, {"id": "landscape", "width": 300, "height": 200}]);
 
-fileManager.drawImageOnCanvas('save');
 
-blur.setOff('blur', 'cutout');
-blur.setOff('blur', 'portBig');
-blur.setOff('blur', 'landscape');
+blur.setOff('blur', ['cutout','portBig', 'landscape']);
+
 
 
 </script>

@@ -1,6 +1,11 @@
 class CanvasController {
-    constructor(canvasId, svgControllerInstance, widthLimit, heightLimit) {
-        this.canvas = document.getElementById(canvasId);
+    constructor(canvasContainer, cl, id, svgControllerInstance, widthLimit, heightLimit) {
+        this.canvas = document.createElement("canvas");
+        this.canvas.classList.add(cl);
+        this.canvas.id = cl + id;
+        canvasContainer.appendChild(this.canvas);
+
+
         this.canvasCtx = this.canvas.getContext('2d');
 
         this.svgC = svgControllerInstance;
@@ -11,25 +16,26 @@ class CanvasController {
         this.saving = false;
     }
 
-    setCanvasSave(downloadId, fileName){
+    setCanvasSave(saveContainer, fileName){
         this.saving = true;
-        this.downloadId = downloadId;
+        this.dwnL = document.createElement("a");
+        saveContainer.appendChild(this.dwnL);
         this.fileName = fileName;
     }
 
     drawAll(image) {
-        this.drawImg(image);
-        this.drawEllipses();
+        this._drawImgOnCanvas(image);
+        this._drawEllipsesOnCanvas();
         if(this.saving) {
-            var downloadButton = document.getElementById(this.downloadId);
-            downloadButton.href = this.canvas.toDataURL('image/jpeg', 1.0);
-            downloadButton.download = this.fileName;
+            this.dwnL.href = this.canvas.toDataURL('image/jpeg', 1.0);
+            this.dwnL.download = this.fileName;
+            this.dwnL.innerHTML = this.fileName;
         }
     }
 
-    drawImg(image) {
-        var imageHeight = image.height;
-        var imageWidth = image.width;
+    _drawImgOnCanvas(image) {
+        let imageHeight = image.height;
+        let imageWidth = image.width;
 
         if (imageWidth > this.widthLimit) { //check width from original
             imageHeight = (imageHeight / imageWidth) * this.widthLimit;
@@ -68,25 +74,25 @@ class CanvasController {
         }
     }
 
-    drawEllipses() {
+    _drawEllipsesOnCanvas() {
         //ellipses style
         this.canvasCtx.filter = "blur(5px)";
         this.canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
 
         //resize ratio
-        var svgWidth = this.svgC.svg.style.width.replace('px', '');
-        var canvasWidth = this.canvas.width;
-        var canvasHeight = this.canvas.height;
+        const svgWidth = this.svgC.svg.style.width.replace('px', '');
+        const canvasWidth = this.canvas.width;
+        const canvasHeight = this.canvas.height;
 
-        var ratio = canvasWidth / svgWidth;
+        const ratio = canvasWidth / svgWidth;
 
-        for (var i = 0; i < this.svgC.svgEllipses.length; i++) {
-            var ellipse = this.svgC.svgEllipses[i];
+        for (let i = 0; i < this.svgC.svgEllipses.length; i++) {
+            const ellipse = this.svgC.svgEllipses[i];
 
-            var cx = ellipse.getAttribute('cx') * ratio;
-            var cy = ellipse.getAttribute('cy') * ratio;
-            var rx = ellipse.getAttribute('rx') * ratio;
-            var ry = ellipse.getAttribute('ry') * ratio;
+            const cx = ellipse.getAttribute('cx') * ratio;
+            const cy = ellipse.getAttribute('cy') * ratio;
+            const rx = ellipse.getAttribute('rx') * ratio;
+            const ry = ellipse.getAttribute('ry') * ratio;
 
 
             this.canvasCtx.beginPath();

@@ -5,22 +5,22 @@ class BlurFace {
         this.on = false;
         this.fileManager = fileManager;
 
-        this.listenToSwitch(switchId);
-        this.addEllipse();
+        this._listenToSwitch(switchId);
+        this._addEllipse();
 
         this.touchTime = 0;
     }
 
-    listenToSwitch(blurId) {
-        var blurFace = document.getElementById(blurId);
+    _listenToSwitch(blurId) {
+        const blurFace = document.getElementById(blurId);
         blurFace.addEventListener('change', () => {
             this.on = blurFace.checked;
-            if (this.on) this.svgC.setCutOff();
+            if (this.on) this.fileManager.setCutOff();
         });
     }
 
 
-    addEllipse() {
+    _addEllipse() {
         this.ellipse = null;
         this.startX = 0;
         this.startY = 0;
@@ -30,14 +30,14 @@ class BlurFace {
 
         this.svgC.svg.addEventListener('mousedown', (event) => {
             event.preventDefault();
-            this.downListener();
+            this._downListener();
 
         });
         window.addEventListener('mousemove', () => {
-            this.moveListener();
+            this._moveListener();
         });
         window.addEventListener('mouseup', () => {  //click / end of drag detection
-            this.upListener()
+            this._upListener()
         });
 
 
@@ -45,17 +45,17 @@ class BlurFace {
         this.svgC.svg.addEventListener('touchstart', (event) => {
             event.preventDefault();
             this.svgC.listenEvent(event);
-            this.downListener();
+            this._downListener();
         });
         window.addEventListener('touchmove', () => {
-            this.moveListener();
+            this._moveListener();
         });
         window.addEventListener('touchend', () => {
-            this.upListener()
+            this._upListener()
         });
     }
 
-    downListener() {
+    _downListener() {
         if (!this.on) return;
 
         this.mouseDown = true;
@@ -66,13 +66,13 @@ class BlurFace {
         this.ellipse.setAttribute('opacity', '0.9');
         this.ellipse.setAttribute('filter', 'url(#blurFilter)');
 
-        var el = this.ellipse;
+        const el = this.ellipse;
 
         el.addEventListener("click", () => {
-            this.doubleClickListener(el)
+            this._doubleClickListener(el)
         });
         el.addEventListener("touchend", () => {
-            this.doubleClickListener(el)
+            this._doubleClickListener(el)
         });
 
         this.svgC.svg.appendChild(this.ellipse);
@@ -87,7 +87,7 @@ class BlurFace {
         }, this.DELAY);
     }
 
-    doubleClickListener(el) {
+    _doubleClickListener(el) {
         if (!this.on) {
             return;
         }
@@ -99,7 +99,7 @@ class BlurFace {
                 el.remove();
                 this.svgC.svgEllipses.splice(this.svgC.svgEllipses.indexOf(el), 1);
 
-                this.updateCutout();
+                this._updateCutout();
                 this.touchTime = 0;
             } else {
                 this.touchTime = new Date().getTime();
@@ -107,21 +107,21 @@ class BlurFace {
         }
     }
 
-    moveListener() {
+    _moveListener() {
         if (!this.on || !this.mouseDown) {
             return;
         }
 
-        var width = Math.abs(this.startX - this.svgC.mouseX);
-        var height = Math.abs(this.startY - this.svgC.mouseY);
+        const width = Math.abs(this.startX - this.svgC.mouseX);
+        const height = Math.abs(this.startY - this.svgC.mouseY);
 
-        this.ellipse.setAttribute('cx', (this.startX + this.svgC.mouseX + 5) / 2); // '5' for blur edge
-        this.ellipse.setAttribute('cy', (this.startY + this.svgC.mouseY + 5) / 2);
-        this.ellipse.setAttribute('rx', width / 2);
-        this.ellipse.setAttribute('ry', height / 2);
+        this.ellipse.setAttribute('cx', ((this.startX + this.svgC.mouseX + 5) / 2).toString()); // '5' for blur edge
+        this.ellipse.setAttribute('cy', ((this.startY + this.svgC.mouseY + 5) / 2).toString());
+        this.ellipse.setAttribute('rx', (width / 2).toString());
+        this.ellipse.setAttribute('ry', (height / 2).toString());
     }
 
-    upListener() {
+    _upListener() {
         if (!this.on || !this.mouseDown) { //if off or drag didn't start inside
             return;
         }
@@ -135,20 +135,23 @@ class BlurFace {
             return;
         }
         this.svgC.svgEllipses.push(this.ellipse);
-        this.updateCutout();
+        this._updateCutout();
     }
 
-    updateCutout(){
-        this.fileManager.resetCutouts();
+    _updateCutout(){
+        this.fileManager.resetCanvases();
     }
 
-    setOff(buttonId, offButtonId) {
-        var button = document.getElementById(buttonId);
-        var offButton = document.getElementById(offButtonId);
-        offButton.addEventListener('click', () => {
-            button.checked = false;
-            this.on = false;
-        });
+    setOff(buttonId, offButtonIds) {
+        const button = document.getElementById(buttonId);
+        for(let i = 0; i < offButtonIds.length; i++){
+            const offButton = document.getElementById(offButtonIds[i]);
+            offButton.addEventListener('click', () => {
+                button.checked = false;
+                this.on = false;
+            });
+        }
+
     }
 }
 

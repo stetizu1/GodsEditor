@@ -5,9 +5,9 @@ class SVGController {
 
         this.mouseX = 0;
         this.mouseY = 0;
-        this.listenToMousePosition();
+        this._listenToMousePosition();
 
-        this.initImage();
+        this._initImage();
 
         this.svgEllipses = [];
         this.rectGroup = null;
@@ -18,12 +18,10 @@ class SVGController {
         this.imageOriginalHeight = 0;
         this.imageOriginalWidth = 0;
         this.circleSize = '10';
-
-        this.cutoutOn = false;
     }
 
-    listenToMousePosition() {
-        var mousePos = (event) => {
+    _listenToMousePosition() {
+        const mousePos = (event) => {
             this.listenEvent(event);
         };
         window.addEventListener('mousemove', mousePos);
@@ -31,20 +29,7 @@ class SVGController {
         window.addEventListener('scroll', mousePos);
     }
 
-    listenEvent(event) {
-        var rect = this.svg.getBoundingClientRect();
-        var position = {top: (rect.top), left: rect.left};
-
-        if (event.clientX) {
-            this.mouseX = event.clientX - position.left; //only clientX / -Y has same behavior on Firefox and Chrome
-            this.mouseY = event.clientY - position.top;
-        } else if(event.touches && event.touches[0].clientX) {
-            this.mouseX = event.touches[0].clientX - position.left;
-            this.mouseY = event.touches[0].clientY - position.top;
-        }
-    }
-
-    initImage() {
+    _initImage() {
         //init img
         this.svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.svgImg.setAttributeNS(null, 'x', '0');
@@ -53,74 +38,34 @@ class SVGController {
         this.svg.appendChild(this.svgImg); //add image to svg
     }
 
-    clear() {
-        for (var i = 0; i < this.svgEllipses.length; i++) {
-            this.svgEllipses[i].remove();
-        }
-        this.setCutOff();
+    _drawEllipses(oldWidth) {
+        const resize = this.calcWidth / oldWidth;
+        for (let i = 0; i < this.svgEllipses.length; i++) {
+            const ellipse = this.svgEllipses[i];
 
-        //reset attributes of img
-        this.rotation = 0;
-        this.svgImg.setAttributeNS(null, 'x', '0');
-        this.svgImg.setAttributeNS(null, 'y', '0');
-        this.svgImg.setAttribute('transform', 'rotate(0)');
-
-        this.svgEllipses = [];
-    }
-
-    redrawImage(image) {
-        var oldWidth = this.calcWidth;
-        this.drawImg(image);
-        this.drawEllipses(oldWidth);
-    }
-
-    drawImg(image) {
-        this.svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image.src);
-        this.imageOriginalWidth = image.width;
-        this.imageOriginalHeight = image.height;
-
-        //small screens
-        var screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-        var coef = screenWidth >= 980 ? 0.5 : 0.9;
-
-        this.calcWidth = coef * screenWidth;
-        var calcHeight;
-
-        if (this.rotation === 0 || this.rotation === 180) {
-            calcHeight = image.height / image.width * coef * screenWidth;
-            this.refreshXY(this.rotation, this.calcWidth, calcHeight);
-
-            this.svg.style.height = calcHeight + 'px';
-            this.svg.style.width = this.calcWidth + 'px';
-            this.setWidthAndHeight(this.calcWidth, calcHeight);
-        } else {
-            calcHeight = image.width / image.height * coef * screenWidth;
-            this.refreshXY(this.rotation, this.calcWidth, calcHeight);
-
-            this.svg.style.height = calcHeight + 'px';
-            this.svg.style.width = this.calcWidth + 'px';
-            // noinspection JSSuspiciousNameCombination
-            this.setWidthAndHeight(calcHeight, this.calcWidth);
-        }
-
-    }
-
-    drawEllipses(oldWidth) {
-        var resize = this.calcWidth / oldWidth;
-        for (var i = 0; i < this.svgEllipses.length; i++) {
-            var ellipse = this.svgEllipses[i];
-
-            var newRX = ellipse.getAttributeNS(null, 'rx') * resize;
-            var newRY = ellipse.getAttributeNS(null, 'ry') * resize;
-            var newCX = ellipse.getAttributeNS(null, 'cx') * resize;
-            var newCY = ellipse.getAttributeNS(null, 'cy') * resize;
+            const newRX = ellipse.getAttributeNS(null, 'rx') * resize;
+            const newRY = ellipse.getAttributeNS(null, 'ry') * resize;
+            const newCX = ellipse.getAttributeNS(null, 'cx') * resize;
+            const newCY = ellipse.getAttributeNS(null, 'cy') * resize;
 
             //set rx and ry
-            ellipse.setAttributeNS(null, 'rx', newRX);
-            ellipse.setAttributeNS(null, 'ry', newRY);
-            ellipse.setAttributeNS(null, 'cx', newCX);
-            ellipse.setAttributeNS(null, 'cy', newCY);
+            ellipse.setAttributeNS(null, 'rx', newRX.toString());
+            ellipse.setAttributeNS(null, 'ry', newRY.toString());
+            ellipse.setAttributeNS(null, 'cx', newCX.toString());
+            ellipse.setAttributeNS(null, 'cy', newCY.toString());
+        }
+    }
 
+    listenEvent(event) {
+        const rect = this.svg.getBoundingClientRect();
+        const position = {top: (rect.top), left: rect.left};
+
+        if (event.clientX) {
+            this.mouseX = event.clientX - position.left; //only clientX / -Y has same behavior on Firefox and Chrome
+            this.mouseY = event.clientY - position.top;
+        } else if(event.touches && event.touches[0].clientX) {
+            this.mouseX = event.touches[0].clientX - position.left;
+            this.mouseY = event.touches[0].clientY - position.top;
         }
     }
 
@@ -144,6 +89,57 @@ class SVGController {
         this.svgImg.setAttributeNS(null, 'y', this.y);
     }
 
+    drawImg(image) {
+        this.svgImg.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image.src);
+        this.imageOriginalWidth = image.width;
+        this.imageOriginalHeight = image.height;
+
+        //small screens
+        const screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+        const coef = screenWidth >= 980 ? 0.5 : 0.9;
+
+        this.calcWidth = coef * screenWidth;
+        let calcHeight;
+
+        if (this.rotation === 0 || this.rotation === 180) {
+            calcHeight = image.height / image.width * coef * screenWidth;
+            this.refreshXY(this.rotation, this.calcWidth, calcHeight);
+
+            this.svg.style.height = calcHeight + 'px';
+            this.svg.style.width = this.calcWidth + 'px';
+            this.setWidthAndHeight(this.calcWidth, calcHeight);
+        } else {
+            calcHeight = image.width / image.height * coef * screenWidth;
+            this.refreshXY(this.rotation, this.calcWidth, calcHeight);
+
+            this.svg.style.height = calcHeight + 'px';
+            this.svg.style.width = this.calcWidth + 'px';
+            // noinspection JSSuspiciousNameCombination
+            this.setWidthAndHeight(calcHeight, this.calcWidth);
+        }
+
+    }
+
+    redrawImage(image) {
+        const oldWidth = this.calcWidth;
+        this.drawImg(image);
+        this._drawEllipses(oldWidth);
+    }
+
+    clear() {
+        for (let i = 0; i < this.svgEllipses.length; i++) {
+            this.svgEllipses[i].remove();
+        }
+
+        //reset attributes of img
+        this.rotation = 0;
+        this.svgImg.setAttributeNS(null, 'x', '0');
+        this.svgImg.setAttributeNS(null, 'y', '0');
+        this.svgImg.setAttribute('transform', 'rotate(0)');
+
+        this.svgEllipses = [];
+    }
+
     setWidthAndHeight(width, height) {
         this.svgImg.style.width = width;
         this.svgImg.style.height = height;
@@ -160,11 +156,4 @@ class SVGController {
         return parseInt(this.svg.style.height.replace('px', ''));
     }
 
-    setCutOff() {
-        if (this.rectGroup != null) {
-            this.rectGroup.remove();
-            this.rectGroup = null;
-            this.cutoutOn = false;
-        }
-    }
 }
