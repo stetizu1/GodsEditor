@@ -62,16 +62,15 @@ class BlurFace {
 
         this.ellipse = document.createElementNS(this.svgC.svgNS, 'ellipse');
 
-        this.ellipse.setAttribute('fill', 'white');
-        this.ellipse.setAttribute('opacity', '0.9');
+        this.ellipse.setAttribute('fill', '#edac69');
         this.ellipse.setAttribute('filter', 'url(#blurFilter)');
 
         const el = this.ellipse;
 
-        el.addEventListener("click", () => {
+        el.addEventListener('click', () => {
             this._doubleClickListener(el)
         });
-        el.addEventListener("touchend", () => {
+        el.addEventListener('touchend', () => {
             this._doubleClickListener(el)
         });
 

@@ -16,11 +16,18 @@ class CanvasController {
         this.saving = false;
     }
 
-    setCanvasSave(saveContainer, fileName){
+    setCanvasSave(saveContainer, fileName, order){
         this.saving = true;
-        this.dwnL = document.createElement("a");
+        this.dwnL = document.createElement('a');
+        this.dwnL.style.order = order;
+
         saveContainer.appendChild(this.dwnL);
         this.fileName = fileName;
+    }
+    reloadFileSave(order){
+        this.dwnL.download = this.fileName;
+        this.dwnL.innerHTML = this.fileName;
+        this.dwnL.style.order = order;
     }
 
     drawAll(image) {
@@ -76,8 +83,9 @@ class CanvasController {
 
     _drawEllipsesOnCanvas() {
         //ellipses style
-        this.canvasCtx.filter = "blur(5px)";
-        this.canvasCtx.fillStyle = "rgba(255,255,255,0.9)";
+        const n = 5 * this.canvas.width / this.svgC.getSVGWidth();
+        this.canvasCtx.filter = 'blur('+ n + 'px)';
+        this.canvasCtx.fillStyle = '#edac69';
 
         //resize ratio
         const svgWidth = this.svgC.svg.style.width.replace('px', '');

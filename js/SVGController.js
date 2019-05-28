@@ -1,7 +1,7 @@
 class SVGController {
     constructor(svgId) {
         this.svg = document.getElementById(svgId);
-        this.svgNS = "http://www.w3.org/2000/svg";
+        this.svgNS = 'http://www.w3.org/2000/svg';
 
         this.mouseX = 0;
         this.mouseY = 0;
@@ -17,7 +17,7 @@ class SVGController {
         this.y = '0';
         this.imageOriginalHeight = 0;
         this.imageOriginalWidth = 0;
-        this.circleSize = '10';
+        this.circleSize = NumberConstants.SMALL_CIRCLE_R;
     }
 
     _listenToMousePosition() {
@@ -53,6 +53,13 @@ class SVGController {
             ellipse.setAttributeNS(null, 'ry', newRY.toString());
             ellipse.setAttributeNS(null, 'cx', newCX.toString());
             ellipse.setAttributeNS(null, 'cy', newCY.toString());
+        }
+    }
+
+    drawEllipses(){
+        for (let i = 0; i < this.svgEllipses.length; i++){
+            const ellipse = this.svgEllipses[i];
+            this.svg.appendChild(ellipse);
         }
     }
 
@@ -96,20 +103,20 @@ class SVGController {
 
         //small screens
         const screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-        const coef = screenWidth >= 980 ? 0.5 : 0.9;
+        const coefficient = screenWidth >= NumberConstants.SCREEN_WIDTH_LIMIT ? NumberConstants.WIDTH_COEFFICIENT_BIG_SCREEN : NumberConstants.WIDTH_COEFFICIENT_SMALL_SCREEN;
 
-        this.calcWidth = coef * screenWidth;
+        this.calcWidth = coefficient * screenWidth;
         let calcHeight;
 
         if (this.rotation === 0 || this.rotation === 180) {
-            calcHeight = image.height / image.width * coef * screenWidth;
+            calcHeight = image.height / image.width * coefficient * screenWidth;
             this.refreshXY(this.rotation, this.calcWidth, calcHeight);
 
             this.svg.style.height = calcHeight + 'px';
             this.svg.style.width = this.calcWidth + 'px';
             this.setWidthAndHeight(this.calcWidth, calcHeight);
         } else {
-            calcHeight = image.width / image.height * coef * screenWidth;
+            calcHeight = image.width / image.height * coefficient * screenWidth;
             this.refreshXY(this.rotation, this.calcWidth, calcHeight);
 
             this.svg.style.height = calcHeight + 'px';
@@ -127,6 +134,8 @@ class SVGController {
     }
 
     clear() {
+        this.rotation = 0;
+
         for (let i = 0; i < this.svgEllipses.length; i++) {
             this.svgEllipses[i].remove();
         }

@@ -24,6 +24,28 @@ class Rotator {
         });
     }
 
+    static setRotation(svgC){
+        const rotation = svgC.rotation;
+        const width = svgC.svg.style.width.replace('px', '');
+        let height;
+        if (rotation === 0 || rotation === 180){
+            height = svgC.svg.style.height.replace('px', '');
+            svgC.setWidthAndHeight(width, height);
+        }
+        else {
+            const oldH = svgC.svg.style.height.replace('px', '');
+            height = width / oldH * width;
+            // noinspection JSSuspiciousNameCombination
+            svgC.setWidthAndHeight(height, width);
+        }
+
+        svgC.refreshXY(rotation, width, height);
+
+
+        svgC.svg.style.height = height + 'px';
+        svgC.svgImg.setAttribute('transform', 'rotate(' + rotation + ')');
+    }
+
     _rotate() {
         const rotation = this.svgC.rotation;
 
