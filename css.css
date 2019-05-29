@@ -122,8 +122,14 @@ canvas, svg {
 }
 .gallery-container {
     display: flex;
-    padding: 0 5px;
+    margin: 0 5px;
+    border: 3px solid transparent;
 }
+
+.gallery-container.active {
+    border: 3px solid #f49f01;
+}
+
 .gallery-container button {
     padding: 5px 8px;
 }

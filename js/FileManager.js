@@ -31,7 +31,7 @@ class FileManager {
 
         //on window resize
         window.addEventListener('resize', () => {
-            if(this._empty())return;
+            if(this.empty())return;
             this.svgC.redrawImage(this.gallerySave[this.active].image);
             this.setCutOff();
             const screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
@@ -39,7 +39,7 @@ class FileManager {
         });
     }
 
-    _empty() {
+    empty() {
         return this.count === 0;
     }
 
@@ -74,7 +74,7 @@ class FileManager {
     }
 
     _addImage(image){
-        if(!this._empty()){
+        if(!this.empty()){
             //save svg state for reactivation
             this.gallerySave[this.active].update(this.svgC.svgEllipses, this.svgC.rotation);
         }
@@ -84,14 +84,18 @@ class FileManager {
         this.svgC.clear(); //clear old image
         this.svgC.drawImg(image);
 
+        const oldActive = this.active;
         this.active = this.count; //active index = old count
         this._addGalleryItem(image, this.count);
 
-        if (this._empty()) {
+        if (this.empty()) {
             for (let i = 0; i < this.mainCutouts.length; i++) {
                 this.mainCutouts[i].doDefaultCutout();
             }
+        } else {
+            this.gallerySave[oldActive].orderConainer.classList.remove("active");
         }
+        this.gallerySave[this.active].orderConainer.classList.add("active");
 
         this.count++;
     }
@@ -157,6 +161,9 @@ class FileManager {
 
         const changeOrder = (oldO, newO) => {
             [this.gallerySave[oldO], this.gallerySave[newO]] = [this.gallerySave[newO], this.gallerySave[oldO]];
+            if(this.active === oldO)this.active = newO;
+            else if(this.active === newO)this.active = oldO;
+
             this._refreshIndexes();
         };
 
@@ -178,6 +185,9 @@ class FileManager {
             if(this.active === newActive) return;
 
             this.gallerySave[this.active].update(this.svgC.svgEllipses, this.svgC.rotation);
+
+            this.gallerySave[this.active].orderConainer.classList.remove("active");
+            this.gallerySave[newActive].orderConainer.classList.add("active");
 
             this.active = newActive;
 
@@ -207,6 +217,7 @@ class FileManager {
     }
 
     _refreshIndexes() {
+
         for (let i = 0; i < this.gallerySave.length; i++) {
             this.gallerySave[i].orderConainer.style.order = i.toString();
             this.gallerySave[i].orderConainer.id = "gallery" + i;

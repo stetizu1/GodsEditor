@@ -14,6 +14,10 @@ class BlurFace {
     _listenToSwitch(blurId) {
         const blurFace = document.getElementById(blurId);
         blurFace.addEventListener('change', () => {
+            if(this.fileManager.empty()){
+                blurFace.checked = false;
+                return;
+            }
             this.on = blurFace.checked;
             if (this.on) this.fileManager.setCutOff();
         });
