@@ -1,4 +1,12 @@
 class ItemSave {
+    /**
+     * Saves parameters of images
+     * @param image - original image
+     * @param canvasController - canvas Controller instance for full size
+     * @param canvasCutoutController - canvas Controller instance for cutout
+     * @param cutout - Cutout instance
+     * @param container - div for gallery order
+     */
     constructor(image, canvasController, canvasCutoutController, cutout, container) {
         this.image = image;
         this.drawCanvas = canvasController;

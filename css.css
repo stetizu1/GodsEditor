@@ -13,7 +13,7 @@ body {
     font-size: small;
 }
 
-.cutoutItem {
+.cutout-item {
     padding: 5px;
 }
 
@@ -104,20 +104,11 @@ canvas, svg {
     background-color: white; /*todo delete*/
 }
 
-.galleryItem {
-    position: relative;
-    overflow: hidden;
-}
-
-.cutout, .cutoutMin {
-    position: absolute;
-}
 
 
 #gallery {
     width: 100%;
     margin-bottom: 20px;
-    display: flex;
     flex-wrap: wrap;
 }
 .gallery-container {
@@ -132,4 +123,12 @@ canvas, svg {
 
 .gallery-container button {
     padding: 5px 8px;
+}
+
+.cut-on {
+    display: block;
+}
+
+.cut-off {
+    display: none;
 }

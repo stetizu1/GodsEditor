@@ -1,10 +1,18 @@
 class CanvasController {
-    constructor(canvasContainer, cl, id, svgControllerInstance, widthLimit, heightLimit) {
-        this.canvas = document.createElement("canvas");
-        this.canvas.classList.add(cl);
-        this.canvas.id = cl + id;
-        canvasContainer.appendChild(this.canvas);
+    /**
+     * Creates instance of controller that wraps canvas for necessary functions. It creates canvas inside canvasContainer
+     * @param canvasContainer - div in which is canvas created
+     * @param svgControllerInstance - instance of SVGController
+     * @param widthLimit - max canvas width
+     * @param heightLimit - max canvas height
+     */
+    constructor(canvasContainer, svgControllerInstance, widthLimit, heightLimit) {
+        this.canvasContainer = canvasContainer;
 
+        this.canvas = document.createElement('canvas');
+        this.canvas.style.position = 'absolute';
+
+        this.canvasContainer.appendChild(this.canvas);
 
         this.canvasCtx = this.canvas.getContext('2d');
 
@@ -85,7 +93,7 @@ class CanvasController {
         //ellipses style
         const n = 5 * this.canvas.width / this.svgC.getSVGWidth();
         this.canvasCtx.filter = 'blur('+ n + 'px)';
-        this.canvasCtx.fillStyle = '#edac69';
+        this.canvasCtx.fillStyle = OtherConstants.blurColor;
 
         //resize ratio
         const svgWidth = this.svgC.svg.style.width.replace('px', '');

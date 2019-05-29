@@ -1,4 +1,11 @@
 class Rotator {
+    /**
+     * Creates instance of Rotator, that allows to rotate svg image and set it to canvas
+     * @param svgControllerInstance - instance of SVGController
+     * @param fileManager - instance of FileManager to manage canvases
+     * @param leftId - id of button for left rotation
+     * @param rightId - id of button for right rotation
+     */
     constructor(svgControllerInstance, fileManager, leftId, rightId) {
         this.svgC = svgControllerInstance;
         this.right = false;

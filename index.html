@@ -47,6 +47,7 @@
 </div>
 <script src="js/settings/NumberConstants.js"></script>
 <script src="js/settings/TextConstants.js"></script>
+<script src="js/settings/OtherConstants.js"></script>
 
 <script src="js/ItemSave.js"></script>
 <script src="js/FileManager.js"></script>
@@ -60,7 +61,7 @@
 const SVGInst = new SVGController('svg');
 const fileManager = new FileManager(SVGInst, 'load', 'gallery', 'cutout', 'cutoutConfirm', 'useAsATitle', 'canvasContainer', 'downloadContainer');
 const rotator = new Rotator(SVGInst, fileManager, "turnLeft", "turnRight");
-const blur = new BlurFace(SVGInst, fileManager, "blur");
+const blur = new BlurFace(SVGInst, fileManager, "blur", "blurFilter");
 
 fileManager.registerMainCutouts("minGallery", [{"id": "portBig", "width": 150, "height": 200}, {"id": "landscape", "width": 300, "height": 200}]);
 

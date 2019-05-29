@@ -1,6 +1,14 @@
 class BlurFace {
-    constructor(svgControllerInstance, fileManager, switchId) {
+    /**
+     * Creates BlurFace instance, that can hide faces (draw ellipses)
+     * @param svgControllerInstance
+     * @param fileManager
+     * @param switchId
+     * @param blurFilterId
+     */
+    constructor(svgControllerInstance, fileManager, switchId, blurFilterId) {
         this.svgC = svgControllerInstance;
+        this.blurFilterId = blurFilterId;
 
         this.on = false;
         this.fileManager = fileManager;
@@ -14,7 +22,7 @@ class BlurFace {
     _listenToSwitch(blurId) {
         const blurFace = document.getElementById(blurId);
         blurFace.addEventListener('change', () => {
-            if(this.fileManager.empty()){
+            if (this.fileManager.empty()) {
                 blurFace.checked = false;
                 return;
             }
@@ -45,7 +53,6 @@ class BlurFace {
         });
 
 
-
         this.svgC.svg.addEventListener('touchstart', (event) => {
             event.preventDefault();
             this.svgC.listenEvent(event);
@@ -66,8 +73,8 @@ class BlurFace {
 
         this.ellipse = document.createElementNS(this.svgC.svgNS, 'ellipse');
 
-        this.ellipse.setAttribute('fill', '#edac69');
-        this.ellipse.setAttribute('filter', 'url(#blurFilter)');
+        this.ellipse.setAttribute('fill', OtherConstants.blurColor);
+        this.ellipse.setAttribute('filter', 'url(#' + this.blurFilterId + ')');
 
         const el = this.ellipse;
 
@@ -141,13 +148,13 @@ class BlurFace {
         this._updateCutout();
     }
 
-    _updateCutout(){
+    _updateCutout() {
         this.fileManager.resetCanvases();
     }
 
     setOff(buttonId, offButtonIds) {
         const button = document.getElementById(buttonId);
-        for(let i = 0; i < offButtonIds.length; i++){
+        for (let i = 0; i < offButtonIds.length; i++) {
             const offButton = document.getElementById(offButtonIds[i]);
             offButton.addEventListener('click', () => {
                 button.checked = false;

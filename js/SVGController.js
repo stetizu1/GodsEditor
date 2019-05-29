@@ -1,4 +1,8 @@
 class SVGController {
+    /**
+     * Creates instance of controller that wraps svg for necessary functions
+     * @param svgId - id of svg element
+     */
     constructor(svgId) {
         this.svg = document.getElementById(svgId);
         this.svgNS = 'http://www.w3.org/2000/svg';

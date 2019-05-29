@@ -1,8 +1,18 @@
-var cutout_last_clicked_button = null;
+let cutout_last_clicked_button = null;
 
 class Cutout {
-
-    constructor(svgControllerInstance, fileManager, canvasControllerInstance, height, minWidth, maxWidth, cutButtonId, windowId, fmId) {
+    /**
+     * Cutout manages one cutout for given CanvasController
+     * @param svgControllerInstance - instance of SVController
+     * @param fileManager - instance of FileManager
+     * @param canvasControllerInstance - instance of requester CanvasController
+     * @param height - height of cutout
+     * @param minWidth - min width of cutout
+     * @param maxWidth - max width of cutout
+     * @param cutButtonId - id of button that starts cutout
+     * @param fmId - id from FileManager to recognise confirmation
+     */
+    constructor(svgControllerInstance, fileManager, canvasControllerInstance, height, minWidth, maxWidth, cutButtonId, fmId) {
         this.svgC = svgControllerInstance;
         this.canvasC = canvasControllerInstance;
         this.fileManager = fileManager;
@@ -16,7 +26,6 @@ class Cutout {
         this.rightCircle = null;
         this.rect = null;
 
-        this.canvasWindow = document.getElementById(windowId);
         this.cutter = document.getElementById(cutButtonId);
 
         this.canvasHeight = height;
@@ -26,6 +35,7 @@ class Cutout {
         this.minRatio = this.minCanvasWidth / this.canvasHeight;
         this.maxRatio = this.maxCanvasWidth / this.canvasHeight;
 
+        this._setPositions();
         this._setCutable();
 
         this.sendX = 0;
@@ -36,16 +46,22 @@ class Cutout {
         this.fmId = fmId;
     }
 
+    _setPositions() {
+        this.canvasC.canvasContainer.style.position = 'relative';
+        this.canvasC.canvasContainer.style.overflow = 'hidden';
+    }
 
     _setCutable() {
         this.cutter.addEventListener('click', () => {
-            if (this.svgC.imageOriginalHeight === 0) return;
+            if (this.fileManager.empty()) return;
 
-            if (this.fileManager.cutoutOn && this.svgC.rectGroup != null) {
+            if(this.fileManager.active !== this.fmId) return;
+
+            if (this.fileManager.cutoutOn) {
                 this.fileManager.setCutOff();
             }
 
-            if (!this.fileManager.cutoutOn) {
+            else {
                 this.fileManager.setCutOn();
                 this._makeCutout();
                 cutout_last_clicked_button = this.cutter
@@ -54,9 +70,10 @@ class Cutout {
 
         this.fileManager.cutoutConfirm.addEventListener('click', () => {
             if (this.fileManager.cutoutOn && cutout_last_clicked_button === this.cutter) {
-                if(this.fileManager.active === this.fmId)
-                this._drawCutout();
-                this.fileManager.setCutOff()
+                if (this.fileManager.active === this.fmId) {
+                    this._drawCutout();
+                    this.fileManager.setCutOff()
+                }
             }
         });
 
@@ -66,9 +83,9 @@ class Cutout {
         this.svgC.rectGroup = document.createElementNS(this.svgC.svgNS, 'g');
 
         this.rect = document.createElementNS(this.svgC.svgNS, 'rect');
-        this.rect.setAttributeNS(null, 'fill', 'rgba(192,192,192,0.3)');
-        this.rect.setAttributeNS(null, 'stroke', 'black');
-        this.rect.setAttributeNS(null, 'stroke-width', '2');
+        this.rect.setAttributeNS(null, 'fill', OtherConstants.cutoutColor);
+        this.rect.setAttributeNS(null, 'stroke', OtherConstants.cutoutStrokeColor);
+        this.rect.setAttributeNS(null, 'stroke-width', OtherConstants.cutoutStrokeWidth);
 
         this.svgC.rectGroup.appendChild(this.rect);
         this.svgC.svg.appendChild(this.svgC.rectGroup);
@@ -106,16 +123,16 @@ class Cutout {
         this.leftCircle.setAttributeNS(null, 'r', this.svgC.circleSize);
         this.leftCircle.setAttributeNS(null, 'cx', x1);
         this.leftCircle.setAttributeNS(null, 'cy', y1);
-        this.leftCircle.setAttribute('fill', 'grey');
-        this.leftCircle.setAttribute('stroke', 'black');
+        this.leftCircle.setAttribute('fill', OtherConstants.cutoutCircleColor);
+        this.leftCircle.setAttribute('stroke', OtherConstants.cutoutCircleStrokeColor);
 
 
         this.rightCircle = document.createElementNS(this.svgC.svgNS, 'circle');
         this.rightCircle.setAttributeNS(null, 'r', this.svgC.circleSize);
         this.rightCircle.setAttributeNS(null, 'cx', x2);
         this.rightCircle.setAttributeNS(null, 'cy', y2);
-        this.rightCircle.setAttribute('fill', 'grey');
-        this.rightCircle.setAttribute('stroke', 'black');
+        this.rightCircle.setAttribute('fill', OtherConstants.cutoutCircleColor);
+        this.rightCircle.setAttribute('stroke', OtherConstants.cutoutCircleStrokeColor);
 
         this._setDraggable();
 
@@ -141,11 +158,11 @@ class Cutout {
         const mouseDwn = (event) => {
             if (event.preventDefault) event.preventDefault();
 
-            x = circle.getAttributeNS(null, "cx");
-            y = circle.getAttributeNS(null, "cy");
+            x = circle.getAttributeNS(null, 'cx');
+            y = circle.getAttributeNS(null, 'cy');
 
-            limitX = parseInt(limitCircle.getAttributeNS(null, "cx"));
-            limitY = parseInt(limitCircle.getAttributeNS(null, "cy"));
+            limitX = parseInt(limitCircle.getAttributeNS(null, 'cx'));
+            limitY = parseInt(limitCircle.getAttributeNS(null, 'cy'));
 
             if (right) {
                 limitX += this.limitSVGWidth;
@@ -327,23 +344,23 @@ class Cutout {
         this.contentHeightRatio = this.height / svgClientHeight;
         this.contentWidthRatio = this.width / svgClientWidth;
 
-        const newHeight = this.canvasWindow.clientHeight / this.contentHeightRatio;
+        const newHeight = this.canvasC.canvasContainer.clientHeight / this.contentHeightRatio;
         const shrinkRatio = newHeight / svgClientHeight;
         const newWidth = shrinkRatio * this.width;
 
-        this.canvasC.canvas.style.height = newHeight + "px";
-        this.canvasWindow.style.width = newWidth + "px";
+        this.canvasC.canvas.style.height = newHeight + 'px';
+        this.canvasC.canvasContainer.style.width = newWidth + 'px';
 
-        const x = (-1) * this.leftCircle.getAttributeNS(null, "cx") * shrinkRatio;
-        const y = (-1) * this.leftCircle.getAttributeNS(null, "cy") * shrinkRatio;
-        this.canvasC.canvas.style.left = x + "px";
-        this.canvasC.canvas.style.top = y + "px";
+        const x = (-1) * this.leftCircle.getAttributeNS(null, 'cx') * shrinkRatio;
+        const y = (-1) * this.leftCircle.getAttributeNS(null, 'cy') * shrinkRatio;
+        this.canvasC.canvas.style.left = x + 'px';
+        this.canvasC.canvas.style.top = y + 'px';
 
         if (this.svgC.rotation % 180 === 0) {
             const origHeight = this.svgC.imageOriginalHeight;
             const resizeRatio = origHeight / svgClientHeight;
-            this.sendX = this.leftCircle.getAttributeNS(null, "cx") * resizeRatio;
-            this.sendY = this.leftCircle.getAttributeNS(null, "cy") * resizeRatio;
+            this.sendX = this.leftCircle.getAttributeNS(null, 'cx') * resizeRatio;
+            this.sendY = this.leftCircle.getAttributeNS(null, 'cy') * resizeRatio;
         }
     }
 
