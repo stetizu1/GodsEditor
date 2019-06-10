@@ -95,6 +95,14 @@ class FileManager {
 
     _delete(index) {
         if (this.empty()) return;
+
+        //reset input for adding again
+        this.input.value = '';
+        if(!/safari/i.test(navigator.userAgent)){
+            this.input.type = '';
+            this.input.type = 'file';
+        }
+
         if (this.count === 1) {
             this.setCutOff(); //turns off cutout
             this.svgC.clear(); //clear old image
