@@ -24,7 +24,7 @@ class CanvasController {
         this.saving = false;
     }
 
-    setCanvasSave(saveContainer, fileName, order){
+    setCanvasSave(saveContainer, fileName, order) {
         this.saving = true;
         this.dwnL = document.createElement('a');
         this.dwnL.style.order = order;
@@ -32,7 +32,8 @@ class CanvasController {
         saveContainer.appendChild(this.dwnL);
         this.fileName = fileName;
     }
-    reloadFileSave(order){
+
+    reloadFileSave(order) {
         this.dwnL.download = this.fileName;
         this.dwnL.innerHTML = this.fileName;
         this.dwnL.style.order = order;
@@ -41,8 +42,8 @@ class CanvasController {
     drawAll(image) {
         this._drawImgOnCanvas(image);
         this._drawEllipsesOnCanvas();
-        if(this.saving) {
-            this.dwnL.href = this.canvas.toDataURL('image/jpeg', 1.0);
+        if (this.saving) {
+            this.dwnL.href = this.canvas.toDataURL('image/jpeg', 0.9);
             this.dwnL.download = this.fileName;
             this.dwnL.innerHTML = this.fileName;
         }
@@ -60,7 +61,6 @@ class CanvasController {
             imageWidth = (imageWidth / imageHeight) * this.heightLimit;
             imageHeight = this.heightLimit;
         }
-
 
         if (this.svgC.rotation === 0 || this.svgC.rotation === 180) {
             this.canvas.height = imageHeight;
@@ -92,7 +92,7 @@ class CanvasController {
     _drawEllipsesOnCanvas() {
         //ellipses style
         const n = 5 * this.canvas.width / this.svgC.getSVGWidth();
-        this.canvasCtx.filter = 'blur('+ n + 'px)';
+        this.canvasCtx.filter = 'blur(' + n + 'px)';
         this.canvasCtx.fillStyle = OtherConstants.blurColor;
 
         //resize ratio

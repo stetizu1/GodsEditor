@@ -1,15 +1,14 @@
 class Rotator {
     /**
      * Creates instance of Rotator, that allows to rotate svg image and set it to canvas
-     * @param svgControllerInstance - instance of SVGController
      * @param fileManager - instance of FileManager to manage canvases
      * @param leftId - id of button for left rotation
      * @param rightId - id of button for right rotation
      */
-    constructor(svgControllerInstance, fileManager, leftId, rightId) {
-        this.svgC = svgControllerInstance;
-        this.right = false;
+    constructor(fileManager, leftId, rightId) {
         this.fileManager = fileManager;
+        this.svgC = this.fileManager.svgC;
+        this.right = false;
         this._setRotation(leftId, false);
         this._setRotation(rightId, true);
     }
@@ -21,13 +20,14 @@ class Rotator {
             if (this.svgC.svgImg === null) return;
 
             this.fileManager.setCutOff();
+            this.fileManager.setActiveItemChanged();
 
             this.right = right;
             this.svgC.rotation += degrees;
             if (this.svgC.rotation >= 360) this.svgC.rotation -= 360;
             this._rotate();
 
-            this.fileManager.resetCanvases();
+            this.fileManager.resetCanvases(true);
         });
     }
 

@@ -1,9 +1,9 @@
 let cutout_last_clicked_button = null;
+let i = 0;
 
 class Cutout {
     /**
      * Cutout manages one cutout for given CanvasController
-     * @param svgControllerInstance - instance of SVController
      * @param fileManager - instance of FileManager
      * @param canvasControllerInstance - instance of requester CanvasController
      * @param height - height of cutout
@@ -12,10 +12,10 @@ class Cutout {
      * @param cutButtonId - id of button that starts cutout
      * @param fmId - id from FileManager to recognise confirmation
      */
-    constructor(svgControllerInstance, fileManager, canvasControllerInstance, height, minWidth, maxWidth, cutButtonId, fmId) {
-        this.svgC = svgControllerInstance;
-        this.canvasC = canvasControllerInstance;
+    constructor(fileManager, canvasControllerInstance, height, minWidth, maxWidth, cutButtonId, fmId) {
         this.fileManager = fileManager;
+        this.svgC = this.fileManager.svgC;
+        this.canvasC = canvasControllerInstance;
 
         this.x = 0;
         this.y = 0;
@@ -52,31 +52,31 @@ class Cutout {
     }
 
     _setCutable() {
-        this.cutter.addEventListener('click', () => {
-            if (this.fileManager.empty()) return;
-
-            if(this.fileManager.active !== this.fmId) return;
-
-            if (this.fileManager.cutoutOn) {
-                this.fileManager.setCutOff();
-            }
-
-            else {
+        this.startEventListener = () => {
+            if (!this.fileManager.empty() && this.fileManager.active === this.fmId && !this.fileManager.cutoutOn) {
                 this.fileManager.setCutOn();
                 this._makeCutout();
-                cutout_last_clicked_button = this.cutter
+                cutout_last_clicked_button = this.cutter;
             }
-        });
+        };
 
-        this.fileManager.cutoutConfirm.addEventListener('click', () => {
+        this.endEventListener = () => {
             if (this.fileManager.cutoutOn && cutout_last_clicked_button === this.cutter) {
                 if (this.fileManager.active === this.fmId) {
                     this._drawCutout();
-                    this.fileManager.setCutOff()
+                    this.fileManager.setCutOff();
+                    this.fileManager.setActiveItemChanged();
                 }
             }
-        });
+        };
 
+        this.cutter.addEventListener('click', this.startEventListener);
+        this.fileManager.cutoutConfirm.addEventListener('click',this.endEventListener);
+    }
+
+    removeListeners(){
+        this.cutter.removeEventListener('click', this.startEventListener);
+        this.fileManager.cutoutConfirm.removeEventListener('click',this.endEventListener);
     }
 
     _makeCutout() {
@@ -334,8 +334,6 @@ class Cutout {
     }
 
     _drawCutout() {
-        this.fileManager.drawImageOnCanvas(this.canvasC);
-
         //mozilla - needed instead of svg.clientHeight
         const box = this.svgC.svg.getBoundingClientRect();
         const svgClientHeight = box.bottom - box.top;
@@ -346,10 +344,11 @@ class Cutout {
 
         const newHeight = this.canvasC.canvasContainer.clientHeight / this.contentHeightRatio;
         const shrinkRatio = newHeight / svgClientHeight;
-        const newWidth = shrinkRatio * this.width;
+        const newWindowWidth = shrinkRatio * this.width;
 
         this.canvasC.canvas.style.height = newHeight + 'px';
-        this.canvasC.canvasContainer.style.width = newWidth + 'px';
+        const newWidth = this.canvasC.canvas.clientWidth;
+        this.canvasC.canvasContainer.style.width = newWindowWidth + 'px';
 
         const x = (-1) * this.leftCircle.getAttributeNS(null, 'cx') * shrinkRatio;
         const y = (-1) * this.leftCircle.getAttributeNS(null, 'cy') * shrinkRatio;
@@ -361,6 +360,10 @@ class Cutout {
             const resizeRatio = origHeight / svgClientHeight;
             this.sendX = this.leftCircle.getAttributeNS(null, 'cx') * resizeRatio;
             this.sendY = this.leftCircle.getAttributeNS(null, 'cy') * resizeRatio;
+            this.fileManager.drawCutoutOnCanvas(this.canvasC, newWidth, newHeight);
+        } else {
+            // noinspection JSSuspiciousNameCombination
+            this.fileManager.drawCutoutOnCanvas(this.canvasC, newHeight, newWidth);
         }
     }
 

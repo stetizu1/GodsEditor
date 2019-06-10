@@ -11,7 +11,7 @@ class SVGController {
         this.mouseY = 0;
         this._listenToMousePosition();
 
-        this._initImage();
+        this.initImage();
 
         this.svgEllipses = [];
         this.rectGroup = null;
@@ -33,7 +33,7 @@ class SVGController {
         window.addEventListener('scroll', mousePos);
     }
 
-    _initImage() {
+    initImage() {
         //init img
         this.svgImg = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         this.svgImg.setAttributeNS(null, 'x', '0');
@@ -109,18 +109,19 @@ class SVGController {
         const screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
         const coefficient = screenWidth >= NumberConstants.SCREEN_WIDTH_LIMIT ? NumberConstants.WIDTH_COEFFICIENT_BIG_SCREEN : NumberConstants.WIDTH_COEFFICIENT_SMALL_SCREEN;
 
-        this.calcWidth = coefficient * screenWidth;
+        const elementWidth = this.svg.parentElement.parentElement.offsetWidth;
+        this.calcWidth = coefficient * elementWidth;
         let calcHeight;
 
         if (this.rotation === 0 || this.rotation === 180) {
-            calcHeight = image.height / image.width * coefficient * screenWidth;
+            calcHeight = image.height / image.width * coefficient * elementWidth;
             this.refreshXY(this.rotation, this.calcWidth, calcHeight);
 
             this.svg.style.height = calcHeight + 'px';
             this.svg.style.width = this.calcWidth + 'px';
             this.setWidthAndHeight(this.calcWidth, calcHeight);
         } else {
-            calcHeight = image.width / image.height * coefficient * screenWidth;
+            calcHeight = image.width / image.height * coefficient * elementWidth;
             this.refreshXY(this.rotation, this.calcWidth, calcHeight);
 
             this.svg.style.height = calcHeight + 'px';

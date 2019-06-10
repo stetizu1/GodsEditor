@@ -1,13 +1,8 @@
-body {
-    background-color: #c0ffee;
-}
-
-* {
+.editor, .editor * {
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    font-family: Arial, serif;
 }
-
 
 .mini {
     font-size: small;
@@ -33,7 +28,6 @@ body {
 
 .svgInner {
     max-width: 55%;
-    margin-left: 5px;
 }
 
 .svgContainer #minGallery {
@@ -58,59 +52,23 @@ body {
     color: #fff;
     padding: 5px 10px;
     border: 1px solid #7bb5ef;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .25rem
 }
 
-.button.confirm{
+.button.confirm {
     background: #47cb2e;
 }
-
-input[type="checkbox"] {
-    display: none;
-}
-
-input[type="checkbox"] + label {
-    padding: 5px 10px;
-}
-
-input[type="checkbox"]:checked + label {
-    background-color: #324b64;
-}
-
-
-@media screen and (max-width: 980px) {
-    .svgContainer {
-        justify-content: center;
-        padding: 10px 0;
-        align-items: flex-start;
-    }
-    .svgContainer #minGallery {
-        flex-direction: row;
-        width: 100%;
-        height: auto;
-        margin-left: 0;
-    }
-
-    .svgInner {
-         max-width: initial;
-    }
-}
-@media screen and (max-width: 550px) {
-    .svgContainer #minGallery {
-        flex-direction: column;
-    }
-}
-
-canvas, svg {
-    background-color: white; /*todo delete*/
-}
-
-
 
 #gallery {
     width: 100%;
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
+
 .gallery-container {
     display: flex;
     margin: 0 5px;
@@ -125,10 +83,81 @@ canvas, svg {
     padding: 5px 8px;
 }
 
-.cut-on {
+.cut-on, .blur-on {
     display: block;
 }
 
-.cut-off {
+.cut-off, .blur-off {
     display: none;
+}
+
+@media all and (max-height: 980px){
+    #minGallery {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+
+    #minGallery.active-gal {
+        opacity: 1;
+        max-height: 800px;
+    }
+}
+
+button.off {
+    cursor: not-allowed !important;
+    opacity: 0.2;
+}
+
+.tools input[type="checkbox"] {
+    display: none;
+}
+
+.tools input[type="checkbox"] + label {
+    padding: 5px 10px;
+    font-family: Arial, serif;
+}
+
+.tools input[type="checkbox"]:checked + label {
+    background-color: #324b64;
+}
+
+.button.btn-danger{
+    background-color: #9a1100;
+}
+
+
+@media screen and (max-width: 980px) {
+    .svgContainer {
+        justify-content: center;
+        padding: 10px 0;
+        align-items: flex-start;
+    }
+
+    .svgContainer #minGallery {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+        margin-left: 0;
+    }
+
+    .svgInner {
+        max-width: initial;
+    }
+}
+
+@media screen and (max-width: 770px) {
+    .svgContainer #minGallery {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .tools {
+        flex-wrap: wrap;
+    }
+
+    .tools .button {
+        width: 100%;
+    }
 }

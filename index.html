@@ -9,22 +9,24 @@
 <body>
 
 <div class="editor">
-    <input type="file" class="wide" id="load">
-    <div class="tools wide">
-        <button id="cutout" class="button">Upravit výřez</button>
+    <label for="load" class="mandatory required"></label>
+    <input type="file" class="wide" id="load" accept="image/*">
+    <div class="tools wide pt-3">
+        <button type="button" id="cutout" class="button">Upravit výřez</button>
 
-        <input type="checkbox" name="tool" id="blur" value="blur">
-        <label for="blur" class="button"> Rozmazání obličeje </label>
+        <button type="button" id="blur" class="button">Zakrytí obličeje</button>
 
-        <button id="turnLeft" class="button">Otočit vlevo</button>
-        <button id="turnRight" class="button">Otočit vpravo</button>
+        <button type="button" id="turnLeft" class="button">Otočit vlevo</button>
+        <button type="button" id="turnRight" class="button">Otočit vpravo</button>
 
-        <button id="useAsATitle" class="button">Použít na titulní stránku</button>
+        <button type="button" id="useAsATitle" class="button">Použít na titulní stránku</button>
+        <button type="button" id="delete" class="button">Odstranit</button>
     </div>
     <div class="tools">
-        <button id="cutoutConfirm" class="button confirm">Potvrdit výřez</button>
+        <button type="button" id="cutoutConfirm" class="button confirm">Potvrdit výřez</button>
+        <button type="button" id="blurConfirm" class="button confirm">Potvrdit zakrytí</button>
     </div>
-    <div class="svgContainer">
+    <div class="svgContainer pt-3">
         <div class="svgInner">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg">
                 <defs id="defs">
@@ -38,13 +40,20 @@
         </div>
     </div>
 
-    <div class="canvasContainer" id="canvasContainer" style="visibility: hidden; position: absolute; z-index: -1000; height: 0; width: 0; overflow: hidden"></div>
+    <div class="canvasContainer" id="canvasContainer"
+         style="visibility: hidden; position: absolute; z-index: -1000; height: 0; width: 0; overflow: hidden"></div>
     <div class="tools wide" id="downloadContainer" style="display: flex;"></div>
 
 
     <div id="gallery"></div>
+    <button type="button" id="deleteAll" class="button btn-danger p-1 mr-2">Odstranit vše</button>
+    <button type="button" id="deleteAllOthers" class="button btn-danger p-1">Odstranit ilustrační fotografie</button>
 
 </div>
+<script>
+    const cbt = 'Upravit výřez';
+    const smallTxt = 'Zvolený obrázek je příliš malý. \nZvolte obrázek o rozměrech alespoň ';
+</script>
 <script src="js/settings/NumberConstants.js"></script>
 <script src="js/settings/TextConstants.js"></script>
 <script src="js/settings/OtherConstants.js"></script>
@@ -58,17 +67,13 @@
 <script src="js/Cutout.js"></script>
 <script>
 
-const SVGInst = new SVGController('svg');
-const fileManager = new FileManager(SVGInst, 'load', 'gallery', 'cutout', 'cutoutConfirm', 'useAsATitle', 'canvasContainer', 'downloadContainer');
-const rotator = new Rotator(SVGInst, fileManager, "turnLeft", "turnRight");
-const blur = new BlurFace(SVGInst, fileManager, "blur", "blurFilter");
+    const fileManager = new FileManager('svg', 'load', 'gallery', 'cutout', 'cutoutConfirm', 'useAsATitle', 'delete', 'canvasContainer', 'downloadContainer', 'deleteAll', 'deleteAllOthers');
+    const blur = new BlurFace(fileManager, 'blur', 'blurConfirm', 'blurFilter');
+    new Rotator(fileManager, 'turnLeft', 'turnRight');
 
-fileManager.registerMainCutouts("minGallery", [{"id": "portBig", "width": 150, "height": 200}, {"id": "landscape", "width": 300, "height": 200}]);
+    fileManager.registerMainCutouts("minGallery", [{"id": "cut1", "width": 150, "height": 200}, {"id": "cut2", "width": 300, "height": 200}]);
 
-
-blur.setOff('blur', ['cutout','portBig', 'landscape']);
-
-
+    blur.setOff(['turnLeft', 'turnRight', 'cutout', 'cut1', 'cut2', 'delete']);
 
 </script>
 </body>

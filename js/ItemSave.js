@@ -15,6 +15,8 @@ class ItemSave {
 
         this.orderConainer = container;
 
+        this.changed = false;
+
         //from svg
         this.ellipses = [];
         this.rotation = [];

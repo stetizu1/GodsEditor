@@ -11,9 +11,13 @@ const
     mainCutoutInnerDivClass = 'cutout-item',
     galleryOuterDivClass = 'gallery-container',
     galleryInnerDivClass = 'gallery-item',
-    classActive = 'active',
+    activeClass = 'active',
+    galleryActiveClass = 'active-gal',
     cutoutOffClass = 'cut-off',
     cutoutOnClass = 'cut-on',
+    blurOnClass = 'blur-on',
+    blurOffClass = 'blur-off',
+    buttonOffClass = 'off',
     buttonClass = 'button',
     smallTextClass = 'mini';
 
@@ -58,8 +62,12 @@ class TextConstants {
         return galleryInnerDivClass;
     }
 
-    static get classActive() {
-        return classActive;
+    static get activeClass() {
+        return activeClass;
+    }
+
+    static get galleryActiveClass() {
+        return galleryActiveClass;
     }
 
     static get cutoutOffClass() {
@@ -68,6 +76,18 @@ class TextConstants {
 
     static get cutoutOnClass() {
         return cutoutOnClass;
+    }
+
+    static get blurOffClass() {
+        return blurOffClass;
+    }
+
+    static get blurOnClass() {
+        return blurOnClass;
+    }
+
+    static get buttonOffClass() {
+        return buttonOffClass;
     }
 
     static get buttonClass() {

@@ -1,34 +1,42 @@
 class BlurFace {
     /**
      * Creates BlurFace instance, that can hide faces (draw ellipses)
-     * @param svgControllerInstance
-     * @param fileManager
-     * @param switchId
+     * @param fileManager - instance of FileManager
+     * @param onId - id of button to start blur face
+     * @param offId - id of button to end blur face
      * @param blurFilterId
      */
-    constructor(svgControllerInstance, fileManager, switchId, blurFilterId) {
-        this.svgC = svgControllerInstance;
+    constructor(fileManager, onId, offId, blurFilterId) {
+        this.fileManager = fileManager;
+        this.svgC = this.fileManager.svgC;
         this.blurFilterId = blurFilterId;
 
         this.on = false;
-        this.fileManager = fileManager;
 
-        this._listenToSwitch(switchId);
+        this._listenToSwitch(onId, offId);
         this._addEllipse();
 
         this.touchTime = 0;
     }
 
-    _listenToSwitch(blurId) {
-        const blurFace = document.getElementById(blurId);
-        blurFace.addEventListener('change', () => {
-            if (this.fileManager.empty()) {
-                blurFace.checked = false;
-                return;
-            }
-            this.on = blurFace.checked;
-            if (this.on) this.fileManager.setCutOff();
+    _listenToSwitch(onId, offId) {
+        this.onButton = document.getElementById(onId);
+        this.offButton = document.getElementById(offId);
+        this.offButton.classList.add(TextConstants.blurOffClass);
+        this.onButton.addEventListener('click', () => {
+            if (this.fileManager.empty()) return;
+            this.offButton.classList.remove(TextConstants.blurOffClass);
+            this.offButton.classList.add(TextConstants.blurOnClass);
+            this.on = true;
+            this.fileManager.setCutOff();
         });
+
+        this.offButton.addEventListener('click', () => {
+            this.offButton.classList.remove(TextConstants.blurOnClass);
+            this.offButton.classList.add(TextConstants.blurOffClass);
+            this.on = false;
+        });
+
     }
 
 
@@ -69,6 +77,7 @@ class BlurFace {
     _downListener() {
         if (!this.on) return;
 
+        this.fileManager.setActiveItemChanged();
         this.mouseDown = true;
 
         this.ellipse = document.createElementNS(this.svgC.svgNS, 'ellipse');
@@ -149,15 +158,15 @@ class BlurFace {
     }
 
     _updateCutout() {
-        this.fileManager.resetCanvases();
+        this.fileManager.resetCanvases(true);
     }
 
-    setOff(buttonId, offButtonIds) {
-        const button = document.getElementById(buttonId);
+    setOff(offButtonIds) {
         for (let i = 0; i < offButtonIds.length; i++) {
             const offButton = document.getElementById(offButtonIds[i]);
             offButton.addEventListener('click', () => {
-                button.checked = false;
+                this.offButton.classList.remove(TextConstants.blurOnClass);
+                this.offButton.classList.add(TextConstants.blurOffClass);
                 this.on = false;
             });
         }
